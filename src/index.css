@@ -1,0 +1,452 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700;800&display=swap");
+
+:root{
+  --bg:#0b0b0f;
+  --card:#2a2a2a;
+  --text:rgba(255,255,255,.92);
+  --muted:rgba(255,255,255,.72);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  background: #0b0b0f;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top center, rgba(255, 120, 210, 0.10) 0%, transparent 26%),
+    radial-gradient(circle at bottom center, rgba(190, 110, 255, 0.10) 0%, transparent 30%),
+    linear-gradient(180deg, #04040a 0%, #090913 42%, #05050a 100%);
+  color: var(--text);
+  font-family:
+    "Raleway",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Noto Color Emoji";
+  -webkit-text-size-adjust: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family:
+    "Raleway",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Noto Color Emoji";
+  font-size: 16px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.app-shell {
+  width: 100%;
+  min-height: 100vh;
+  background: transparent;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* FONDO HYLO PANEL */
+.bg-orb {
+  position: fixed;
+  border-radius: 999px;
+  filter: blur(90px);
+  pointer-events: none;
+  opacity: 0.55;
+  z-index: 0;
+}
+
+.bg-orb-1 {
+  width: 220px;
+  height: 220px;
+  top: 70px;
+  left: -60px;
+  background: rgba(255, 120, 210, 0.18);
+}
+
+.bg-orb-2 {
+  width: 250px;
+  height: 250px;
+  top: 120px;
+  right: -70px;
+  background: rgba(190, 120, 255, 0.15);
+}
+
+.bg-orb-3 {
+  width: 300px;
+  height: 220px;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 170, 210, 0.12);
+}
+
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  left: var(--left);
+  bottom: -20px;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 999px;
+  background: rgba(243, 179, 234, 0.65);
+  box-shadow:
+    0 0 10px rgba(243, 179, 234, 0.35),
+    0 0 20px rgba(243, 179, 234, 0.18);
+  animation: floatUp var(--duration) linear infinite;
+  animation-delay: var(--delay);
+  opacity: 0.7;
+}
+
+.particle-1 { background: rgba(243, 179, 234, 0.75); }
+.particle-2 { background: rgba(255, 158, 220, 0.58); }
+.particle-3 { background: rgba(232, 170, 255, 0.55); }
+.particle-4 { background: rgba(255, 190, 235, 0.52); }
+.particle-5 { background: rgba(243, 179, 234, 0.42); }
+.particle-6 { background: rgba(255, 140, 210, 0.48); }
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-45vh) translateX(12px);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(-95vh) translateX(-8px);
+    opacity: 0;
+  }
+}
+
+.hylo-wrap {
+  width: 100%;
+  min-height: 100vh;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 8px 0 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.hylo-grid{
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  padding: 0 14px;
+  overflow: visible;
+}
+
+.hylo-empty{
+  position: relative;
+  z-index: 0;
+  background: linear-gradient(180deg, rgba(34,34,40,0.96) 0%, rgba(18,18,22,0.985) 100%);
+  border-radius: 18px;
+  padding: 18px 16px;
+  box-shadow: 0 18px 40px rgba(0,0,0,.14);
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255,255,255,.75);
+}
+
+/* BLOQUE COMPLETO: HYLO + PROMO */
+/* SEPARACIÓN BESTIA ENTRE HYL0S */
+.hylo-item{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+
+  padding-top: 70px;
+  padding-bottom: 70px;
+}
+
+/* 👉 SOLO EL PRIMER HYLO */
+.hylo-item:first-child{
+  margin-top: 200px;
+}
+
+/* CARD */
+.hylo-card{
+  position: relative;
+  z-index: 0;
+  border-radius: 24px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(34,34,40,0.96) 0%, rgba(18,18,22,0.985) 100%);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.20);
+  overflow: hidden;
+}
+
+.hylo-card-content{
+  position: relative;
+  z-index: 1;
+}
+
+.hylo-card-overlay{
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  pointer-events: none;
+}
+
+.hylo-card-overlay--crushes{
+  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+}
+
+.hylo-card-overlay--apuntes{
+  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+}
+
+.hylo-card-overlay--actividades{
+  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+}
+
+.hylo-card-overlay--pisos{
+  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+}
+
+.hylo-card-overlay--market{
+  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+}
+
+.hylo-card-overlay--fiestas{
+  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+}
+
+.hylo-card-overlay--eventos{
+  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+}
+
+/* BADGE */
+.hylo-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.hylo-badge-emoji{
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.hylo-badge--crushes{
+  background: rgba(244,178,230,0.12);
+  border: 1px solid rgba(244,178,230,0.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(244,178,230,0.10);
+  color: #f0a8df;
+}
+
+.hylo-badge--apuntes{
+  background: rgba(120,170,255,0.12);
+  border: 1px solid rgba(120,170,255,0.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(120,170,255,0.10);
+  color: #9fc0ff;
+}
+
+.hylo-badge--actividades{
+  background: rgba(255,190,90,0.12);
+  border: 1px solid rgba(255,190,90,0.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(255,190,90,0.10);
+  color: #ffcb72;
+}
+
+.hylo-badge--pisos{
+  background: rgba(120,220,150,0.12);
+  border: 1px solid rgba(120,220,150,0.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(120,220,150,0.10);
+  color: #8fe0b0;
+}
+
+.hylo-badge--market{
+  background: rgba(190,140,255,0.12);
+  border: 1px solid rgba(190,140,255,0.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(190,140,255,0.10);
+  color: #b9a7ff;
+}
+
+.hylo-badge--fiestas{
+  background: rgba(255,120,120,0.12);
+  border: 1px solid rgba(255,120,120,0.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(255,120,120,0.10);
+  color: #ff9ca8;
+}
+
+.hylo-badge--eventos{
+  background: rgba(244,178,230,0.12);
+  border: 1px solid rgba(244,178,230,0.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(244,178,230,0.10);
+  color: #f0a8df;
+}
+
+/* META */
+.hylo-meta{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.hylo-authorline{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.hylo-author{
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(255,255,255,.75);
+  margin: 6px 0 2px 0;
+  opacity: .95;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hylo-time{
+  font-size: 14px;
+  opacity: .75;
+  font-weight: 400;
+  margin-top: 8px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* BODY */
+.hylo-body{
+  font-size: 20px;
+  line-height: 1.35;
+  color: rgba(255,255,255,.95);
+  margin-top: 4px;
+  margin-bottom: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-weight: 400;
+}
+
+/* IMAGEN */
+.hylo-post-img{
+  width: 100%;
+  max-height: 280px;
+  border-radius: 16px;
+  margin-top: 12px;
+  display: block;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+}
+
+/* PROMO FUERA DEL HYLO */
+.hylo-promo-outside{
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.hylo-promo-img{
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  image-rendering: auto;
+}
+
+/* MOBILE */
+@media (max-width: 480px){
+  .hylo-wrap{
+    max-width: none;
+    padding: 8px 0 16px;
+  }
+
+  .hylo-grid{
+    gap: 0;
+    padding: 0 12px;
+  }
+
+  .hylo-card{
+    border-radius: 24px;
+    padding: 20px;
+  }
+
+  .hylo-post-img{
+    max-height: 260px;
+  }
+
+  .hylo-item{
+    margin-bottom: 100px;
+  }
+
+  .hylo-promo-outside{
+    margin-top: 8px;
+  }
+}
