@@ -51,25 +51,62 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const particles = useMemo(() => Array.from({ length: 24 }), []);
 
-  useEffect(() => {
-    async function fetchPosts() {
-      const { data, error } = await supabase
-        .from("panel_posts")
-        .select("*")
-        .order("created_at", { ascending: false });
+  async function fetchPosts() {
+    const { data, error } = await supabase
+      .from("panel_posts")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("FETCH PANEL POSTS ERROR:", error);
-        setRows([]);
-        setLoading(false);
-        return;
-      }
+    console.log("FETCH POSTS DATA:", data);
+    console.log("FETCH POSTS ERROR:", error);
 
-      setRows((data as PanelPostRow[]) ?? []);
+    if (error) {
+      console.error("FETCH PANEL POSTS ERROR:", error);
+      setRows([]);
       setLoading(false);
+      return;
     }
 
+    setRows((data as PanelPostRow[]) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
     fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("panel-posts-feed")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "panel_posts",
+        },
+        async (payload) => {
+          console.log("REALTIME PAYLOAD:", payload);
+          await fetchPosts();
+        }
+      )
+      .subscribe((status) => {
+        console.log("PANEL POSTS REALTIME STATUS:", status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      fetchPosts();
+    }, 5000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, []);
 
   return (
@@ -97,7 +134,6 @@ export default function App() {
 
       <div className="hylo-wrap">
         <div className="hylo-grid">
-          
           {loading ? (
             <div className="hylo-empty">Cargando hylos...</div>
           ) : rows.length === 0 ? (
