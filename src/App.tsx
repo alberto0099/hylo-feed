@@ -53,7 +53,6 @@ function formatFeedDate(iso: string) {
   return d.toLocaleDateString("es-ES");
 }
 
-
 export default function App() {
   const [rows, setRows] = useState<PanelPostRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,23 +126,23 @@ export default function App() {
 
     return (
       <>
-     <div
-  className={`hylo-badge hylo-badge--${category}`}
-  style={{
-    fontSize: 17,
-    padding: "8px 16px",
-    borderRadius: 999,
-    fontWeight: 600,
-  }}
->
+        <div
+          className={`hylo-badge hylo-badge--${category}`}
+          style={{
+            fontSize: capture ? 16 : 15,
+            padding: capture ? "7px 14px" : "7px 14px",
+            borderRadius: 999,
+            fontWeight: 600,
+          }}
+        >
           {meta.emoji ? (
             <span
               className="hylo-badge-emoji"
               aria-hidden="true"
               style={{
-                width: capture ? 30 : 22,
-                height: capture ? 30 : 22,
-                fontSize: capture ? 26 : 19,
+                width: capture ? 26 : 20,
+                height: capture ? 26 : 20,
+                fontSize: capture ? 22 : 17,
               }}
             >
               {meta.emoji}
@@ -153,99 +152,100 @@ export default function App() {
         </div>
 
         <div
-  className="hylo-meta"
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  }}
->
+          className="hylo-meta"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}
+        >
           <div className="hylo-authorline">
             <div
-  className="hylo-author"
-  style={{
-    fontSize: 18,
-    fontWeight: 600,
-    marginTop: 6,
-  }}
->
-  {authorName}
-</div>
+              className="hylo-author"
+              style={{
+                fontSize: capture ? 17 : 16,
+                fontWeight: 600,
+                marginTop: 5,
+              }}
+            >
+              {authorName}
+            </div>
           </div>
 
           <div
-  className="hylo-time"
-  style={{
-    fontSize: 15,
-    opacity: 0.85,
-    fontWeight: 500,
-  }}
->
-  {formatFeedDate(r.created_at)}
-</div>
+            className="hylo-time"
+            style={{
+              fontSize: capture ? 14 : 14,
+              opacity: 0.85,
+              fontWeight: 500,
+            }}
+          >
+            {formatFeedDate(r.created_at)}
+          </div>
         </div>
 
         <p
-  className="hylo-body"
-  style={{
-    fontSize: 18,
-    lineHeight: 1.4,
-    marginTop: 6,
-    fontWeight: 500,
-  }}
->
-  {r.body}
-</p>
-{r.image_url ? (
-  <div
-    style={{
-      width: "100%",
-      marginTop: capture ? 36 : 24,
-      paddingLeft: capture ? 0 : 4,
-      paddingRight: capture ? 0 : 4,
-      display: "flex",
-      justifyContent: "center",
-    }}
-  >
-    <div
-      style={{
-        width: capture ? "100%" : "auto",
-        maxWidth: capture ? "100%" : 300,
-        maxHeight: capture ? 650 : 320,
-        borderRadius: 28,
-        overflow: "hidden",
-        background: "transparent",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <img
-        src={r.image_url}
-        alt=""
-        loading="lazy"
-        crossOrigin="anonymous"
-        onClick={
-          capture
-            ? undefined
-            : () => {
-                setOpenImageUrl(r.image_url);
-              }
-        }
-        style={{
-          width: "auto",
-          height: "auto",
-          maxWidth: "100%",
-          maxHeight: capture ? 650 : 320,
-          objectFit: "contain",
-          display: "block",
-          borderRadius: 28,
-          cursor: capture ? "default" : "zoom-in",
-        }}
-      />
-    </div>
-  </div>
-) : null}
+          className="hylo-body"
+          style={{
+            fontSize: capture ? 17 : 16,
+            lineHeight: 1.38,
+            marginTop: 5,
+            fontWeight: 500,
+          }}
+        >
+          {r.body}
+        </p>
+
+        {r.image_url ? (
+          <div
+            style={{
+              width: "100%",
+              marginTop: capture ? 30 : 20,
+              paddingLeft: capture ? 0 : 2,
+              paddingRight: capture ? 0 : 2,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              style={{
+                width: capture ? "100%" : "auto",
+                maxWidth: capture ? "100%" : 280,
+                maxHeight: capture ? 600 : 290,
+                borderRadius: 24,
+                overflow: "hidden",
+                background: "transparent",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <img
+                src={r.image_url}
+                alt=""
+                loading="lazy"
+                crossOrigin="anonymous"
+                onClick={
+                  capture
+                    ? undefined
+                    : () => {
+                        setOpenImageUrl(r.image_url);
+                      }
+                }
+                style={{
+                  width: "auto",
+                  height: "auto",
+                  maxWidth: "100%",
+                  maxHeight: capture ? 600 : 290,
+                  objectFit: "contain",
+                  display: "block",
+                  borderRadius: 24,
+                  cursor: capture ? "default" : "zoom-in",
+                }}
+              />
+            </div>
+          </div>
+        ) : null}
       </>
     );
   }
@@ -291,8 +291,8 @@ export default function App() {
                   key={r.id}
                   className="hylo-item"
                   style={{
-                    paddingLeft: 12,
-                    paddingRight: 12,
+                    paddingLeft: 10,
+                    paddingRight: 10,
                   }}
                 >
                   <article className={`hylo-card hylo-card--${category}`}>
@@ -302,7 +302,6 @@ export default function App() {
                       {renderHyloContent(r, category, authorName)}
                     </div>
                   </article>
-
 
                   <div className="hylo-promo-slot">
                     <img
