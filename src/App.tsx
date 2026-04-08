@@ -6,7 +6,6 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import html2canvas from "html2canvas";
 import { supabase } from "./supabaseClient";
 import "./index.css";
 
@@ -54,20 +53,10 @@ function formatFeedDate(iso: string) {
   return d.toLocaleDateString("es-ES");
 }
 
-function fileSafeText(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 50);
-}
 
 export default function App() {
   const [rows, setRows] = useState<PanelPostRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [downloadingId, setDownloadingId] = useState<number | null>(null);
   const [openImageUrl, setOpenImageUrl] = useState<string | null>(null);
 
   const particles = useMemo(() => Array.from({ length: 24 }), []);
@@ -124,85 +113,6 @@ export default function App() {
       window.clearInterval(intervalId);
     };
   }, []);
-
-  async function downloadHylo(r: PanelPostRow) {
-    const node = captureRefs.current[r.id];
-    if (!node) return;
-
-    try {
-      setDownloadingId(r.id);
-
-      await new Promise((resolve) => setTimeout(resolve, 400));
-
-      const canvas = await html2canvas(node, {
-        backgroundColor: "#05050a",
-        useCORS: true,
-        allowTaint: false,
-        scale: 1,
-        width: 1080,
-        height: 1350,
-        windowWidth: 1080,
-        windowHeight: 1350,
-        imageTimeout: 15000,
-        logging: false,
-      });
-
-      const fileName = `hylo-${r.id}-${fileSafeText(
-        r.body || MAP[safeCategory(r.category)].label || "post"
-      )}.png`;
-
-      const blob: Blob | null = await new Promise((resolve) =>
-        canvas.toBlob((b) => resolve(b), "image/png")
-      );
-
-      if (!blob) {
-        throw new Error("No se pudo generar el archivo PNG.");
-      }
-
-      const file = new File([blob], fileName, { type: "image/png" });
-
-      const canShareFile =
-        typeof navigator !== "undefined" &&
-        "share" in navigator &&
-        "canShare" in navigator &&
-        navigator.canShare?.({ files: [file] });
-
-      if (canShareFile) {
-        await navigator.share({
-          files: [file],
-          title: "Hylo",
-          text: "Hylo descargado",
-        });
-        return;
-      }
-
-      const objectUrl = URL.createObjectURL(blob);
-
-      const isIOS =
-        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-      if (isIOS) {
-        window.open(objectUrl, "_blank");
-        setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
-        return;
-      }
-
-      const link = document.createElement("a");
-      link.href = objectUrl;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
-    } catch (error) {
-      console.error("DOWNLOAD HYLO ERROR:", error);
-      alert("No se pudo descargar la imagen del hylo.");
-    } finally {
-      setDownloadingId(null);
-    }
-  }
 
   function renderHyloContent(
     r: PanelPostRow,
