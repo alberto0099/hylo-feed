@@ -505,3 +505,47 @@ img {
     margin-top: 8px;
   }
 }
+
+/* 🔥 HYLOS CON IMAGEN MÁS COMPACTOS */
+.hylo-item--image {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+/* Card más pequeña */
+.hylo-item--image .hylo-card {
+  padding: 16px;
+  border-radius: 20px;
+}
+
+/* Texto más pequeño */
+.hylo-item--image .hylo-body {
+  font-size: 14px;
+}
+
+.hylo-item--image .hylo-author {
+  font-size: 13px;
+}
+
+.hylo-item--image .hylo-time {
+  font-size: 11px;
+}
+
+/* Badge más pequeño */
+.hylo-item--image .hylo-badge {
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
+/* Imagen más pequeña */
+.hylo-item--image img {
+  max-height: 220px;
+  border-radius: 20px;
+}
+
+/* Promo más compacta */
+.hylo-item--image .hylo-promo-slot {
+  transform: scale(0.92);
+  transform-origin: top center;
+  margin-top: 4px;
+}
