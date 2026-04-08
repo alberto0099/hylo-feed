@@ -217,14 +217,15 @@ export default function App() {
 
     return (
       <>
-        <div
-          className={`hylo-badge hylo-badge--${category}`}
-          style={{
-            fontSize: capture ? 28 : 18,
-            padding: capture ? "12px 22px" : "8px 16px",
-            gap: capture ? 10 : 8,
-          }}
-        >
+     <div
+  className={`hylo-badge hylo-badge--${category}`}
+  style={{
+    fontSize: 17,
+    padding: "8px 16px",
+    borderRadius: 999,
+    fontWeight: 600,
+  }}
+>
           {meta.emoji ? (
             <span
               className="hylo-badge-emoji"
@@ -241,52 +242,91 @@ export default function App() {
           <span>{meta.label}</span>
         </div>
 
-        <div className="hylo-meta">
+        <div
+  className="hylo-meta"
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  }}
+>
           <div className="hylo-authorline">
-            <div className="hylo-author">{authorName}</div>
+            <div
+  className="hylo-author"
+  style={{
+    fontSize: 18,
+    fontWeight: 600,
+    marginTop: 6,
+  }}
+>
+  {authorName}
+</div>
           </div>
 
-          <div className="hylo-time">{formatFeedDate(r.created_at)}</div>
+          <div
+  className="hylo-time"
+  style={{
+    fontSize: 15,
+    opacity: 0.85,
+    fontWeight: 500,
+  }}
+>
+  {formatFeedDate(r.created_at)}
+</div>
         </div>
 
-        <p className="hylo-body">{r.body}</p>
+        <p
+  className="hylo-body"
+  style={{
+    fontSize: 18,
+    lineHeight: 1.4,
+    marginTop: 6,
+    fontWeight: 500,
+  }}
+>
+  {r.body}
+</p>
 {r.image_url ? (
   <div
     style={{
       width: "100%",
-      marginTop: capture ? 18 : 10,
+      marginTop: capture ? 36 : 24, // 🔥 MUCHO MÁS AIRE
       paddingLeft: capture ? 0 : 10,
       paddingRight: capture ? 0 : 10,
       display: "flex",
       justifyContent: "center",
-      alignItems: "center",
     }}
   >
-    <img
-      src={r.image_url}
-      alt=""
-      className="hylo-post-img"
-      loading="lazy"
-      crossOrigin="anonymous"
-      onClick={
-        capture
-          ? undefined
-          : () => {
-              setOpenImageUrl(r.image_url);
-            }
-      }
+    {/* 🔥 ESTE ES EL NUEVO CONTENEDOR */}
+    <div
       style={{
         width: capture ? "100%" : 260,
-        height: "auto",
-        maxHeight: capture ? 650 : 320,
-        objectFit: "contain",
-        objectPosition: "center",
-        borderRadius: 33,
-        display: "block",
-        background: "transparent",
-        cursor: capture ? "default" : "zoom-in",
+        height: capture ? 650 : 260,
+        borderRadius: 28,
+        overflow: "hidden",
       }}
-    />
+    >
+      <img
+        src={r.image_url}
+        alt=""
+        loading="lazy"
+        crossOrigin="anonymous"
+        onClick={
+          capture
+            ? undefined
+            : () => {
+                setOpenImageUrl(r.image_url);
+              }
+        }
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",   // 🔥 MUY IMPORTANTE
+          display: "block",
+          cursor: capture ? "default" : "zoom-in",
+        }}
+      />
+    </div>
   </div>
 ) : null}
       </>
