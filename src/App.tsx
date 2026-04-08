@@ -122,6 +122,7 @@ export default function App() {
     }
   ): ReactNode {
     const capture = !!opts?.capture;
+    const hasImage = !!r.image_url && !capture;
     const meta = MAP[category];
 
     return (
@@ -129,8 +130,8 @@ export default function App() {
         <div
           className={`hylo-badge hylo-badge--${category}`}
           style={{
-            fontSize: capture ? 16 : 15,
-            padding: capture ? "7px 14px" : "7px 14px",
+            fontSize: capture ? 15 : hasImage ? 13 : 14,
+            padding: capture ? "7px 14px" : hasImage ? "6px 12px" : "7px 13px",
             borderRadius: 999,
             fontWeight: 600,
           }}
@@ -140,9 +141,9 @@ export default function App() {
               className="hylo-badge-emoji"
               aria-hidden="true"
               style={{
-                width: capture ? 26 : 20,
-                height: capture ? 26 : 20,
-                fontSize: capture ? 22 : 17,
+                width: capture ? 24 : hasImage ? 17 : 18,
+                height: capture ? 24 : hasImage ? 17 : 18,
+                fontSize: capture ? 20 : hasImage ? 14 : 15,
               }}
             >
               {meta.emoji}
@@ -157,15 +158,16 @@ export default function App() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-start",
+            marginTop: hasImage ? 8 : 10,
           }}
         >
           <div className="hylo-authorline">
             <div
               className="hylo-author"
               style={{
-                fontSize: capture ? 17 : 16,
+                fontSize: capture ? 16 : hasImage ? 13 : 15,
                 fontWeight: 600,
-                marginTop: 5,
+                marginTop: hasImage ? 3 : 4,
               }}
             >
               {authorName}
@@ -175,9 +177,10 @@ export default function App() {
           <div
             className="hylo-time"
             style={{
-              fontSize: capture ? 14 : 14,
+              fontSize: capture ? 13 : hasImage ? 11 : 12,
               opacity: 0.85,
               fontWeight: 500,
+              marginTop: hasImage ? 3 : 4,
             }}
           >
             {formatFeedDate(r.created_at)}
@@ -187,9 +190,10 @@ export default function App() {
         <p
           className="hylo-body"
           style={{
-            fontSize: capture ? 17 : 16,
-            lineHeight: 1.38,
-            marginTop: 5,
+            fontSize: capture ? 16 : hasImage ? 13 : 15,
+            lineHeight: hasImage ? 1.32 : 1.36,
+            marginTop: hasImage ? 4 : 5,
+            marginBottom: hasImage ? 6 : 0,
             fontWeight: 500,
           }}
         >
@@ -200,9 +204,9 @@ export default function App() {
           <div
             style={{
               width: "100%",
-              marginTop: capture ? 30 : 20,
-              paddingLeft: capture ? 0 : 2,
-              paddingRight: capture ? 0 : 2,
+              marginTop: capture ? 26 : hasImage ? 14 : 18,
+              paddingLeft: capture ? 0 : hasImage ? 0 : 2,
+              paddingRight: capture ? 0 : hasImage ? 0 : 2,
               display: "flex",
               justifyContent: "center",
             }}
@@ -210,9 +214,9 @@ export default function App() {
             <div
               style={{
                 width: capture ? "100%" : "auto",
-                maxWidth: capture ? "100%" : 280,
-                maxHeight: capture ? 600 : 290,
-                borderRadius: 24,
+                maxWidth: capture ? "100%" : hasImage ? 210 : 260,
+                maxHeight: capture ? 560 : hasImage ? 210 : 260,
+                borderRadius: hasImage ? 20 : 22,
                 overflow: "hidden",
                 background: "transparent",
                 display: "flex",
@@ -236,10 +240,10 @@ export default function App() {
                   width: "auto",
                   height: "auto",
                   maxWidth: "100%",
-                  maxHeight: capture ? 600 : 290,
+                  maxHeight: capture ? 560 : hasImage ? 210 : 260,
                   objectFit: "contain",
                   display: "block",
-                  borderRadius: 24,
+                  borderRadius: hasImage ? 20 : 22,
                   cursor: capture ? "default" : "zoom-in",
                 }}
               />
@@ -289,13 +293,17 @@ export default function App() {
               return (
                 <div
                   key={r.id}
-                  className="hylo-item"
+                  className={`hylo-item ${r.image_url ? "hylo-item--image" : ""}`}
                   style={{
                     paddingLeft: 10,
                     paddingRight: 10,
                   }}
                 >
-                  <article className={`hylo-card hylo-card--${category}`}>
+                  <article
+                    className={`hylo-card hylo-card--${category} ${
+                      r.image_url ? "hylo-card--image" : ""
+                    }`}
+                  >
                     <div className={`hylo-card-overlay hylo-card-overlay--${category}`} />
 
                     <div className="hylo-card-content">
@@ -473,7 +481,7 @@ export default function App() {
               width: "auto",
               height: "auto",
               objectFit: "contain",
-              borderRadius: 24,
+              borderRadius: 22,
               display: "block",
               boxShadow: "0 20px 60px rgba(0,0,0,0.40)",
             }}
@@ -489,13 +497,13 @@ export default function App() {
               position: "fixed",
               top: 24,
               right: 24,
-              width: 44,
-              height: 44,
+              width: 42,
+              height: 42,
               borderRadius: 999,
               border: "1px solid rgba(255,255,255,0.16)",
               background: "rgba(255,255,255,0.10)",
               color: "white",
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: 700,
               cursor: "pointer",
               display: "flex",
