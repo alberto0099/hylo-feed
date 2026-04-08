@@ -213,9 +213,51 @@ img {
   z-index: 0;
   border-radius: 24px;
   padding: 20px;
-  background: linear-gradient(180deg, rgba(34,34,40,0.96) 0%, rgba(18,18,22,0.985) 100%);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.20);
   overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.20);
+  background: linear-gradient(180deg, rgba(34,34,40,0.96) 0%, rgba(18,18,22,0.985) 100%);
+}
+
+.hylo-card--crushes{
+  background:
+    radial-gradient(circle at top left, rgba(244,178,230,0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(46,32,44,0.98) 0%, rgba(20,16,24,0.99) 100%);
+}
+
+.hylo-card--apuntes{
+  background:
+    radial-gradient(circle at top left, rgba(120,170,255,0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(28,36,52,0.98) 0%, rgba(15,19,28,0.99) 100%);
+}
+
+.hylo-card--fiestas{
+  background:
+    radial-gradient(circle at top left, rgba(255,120,120,0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(52,28,34,0.98) 0%, rgba(24,14,18,0.99) 100%);
+}
+
+.hylo-card--pisos{
+  background:
+    radial-gradient(circle at top left, rgba(120,220,150,0.15) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(30,42,34,0.98) 0%, rgba(15,22,18,0.99) 100%);
+}
+
+.hylo-card--actividades{
+  background:
+    radial-gradient(circle at top left, rgba(255,190,90,0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(50,38,28,0.98) 0%, rgba(22,18,14,0.99) 100%);
+}
+
+.hylo-card--market{
+  background:
+    radial-gradient(circle at top left, rgba(190,140,255,0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(38,30,52,0.98) 0%, rgba(18,15,28,0.99) 100%);
+}
+
+.hylo-card--eventos{
+  background:
+    radial-gradient(circle at top left, rgba(110,220,255,0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(28,40,48,0.98) 0%, rgba(14,20,24,0.99) 100%);
 }
 
 .hylo-card-content{

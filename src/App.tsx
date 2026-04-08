@@ -290,20 +290,24 @@ export default function App() {
   <div
     style={{
       width: "100%",
-      marginTop: capture ? 36 : 24, // 🔥 MUCHO MÁS AIRE
-      paddingLeft: capture ? 0 : 10,
-      paddingRight: capture ? 0 : 10,
+      marginTop: capture ? 36 : 24,
+      paddingLeft: capture ? 0 : 4,
+      paddingRight: capture ? 0 : 4,
       display: "flex",
       justifyContent: "center",
     }}
   >
-    {/* 🔥 ESTE ES EL NUEVO CONTENEDOR */}
     <div
       style={{
-        width: capture ? "100%" : 260,
-        height: capture ? 650 : 260,
+        width: capture ? "100%" : "auto",
+        maxWidth: capture ? "100%" : 300,
+        maxHeight: capture ? 650 : 320,
         borderRadius: 28,
         overflow: "hidden",
+        background: "transparent",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
       <img
@@ -319,10 +323,13 @@ export default function App() {
               }
         }
         style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",   // 🔥 MUY IMPORTANTE
+          width: "auto",
+          height: "auto",
+          maxWidth: "100%",
+          maxHeight: capture ? 650 : 320,
+          objectFit: "contain",
           display: "block",
+          borderRadius: 28,
           cursor: capture ? "default" : "zoom-in",
         }}
       />
@@ -378,7 +385,7 @@ export default function App() {
                     paddingRight: 12,
                   }}
                 >
-                  <article className="hylo-card">
+                  <article className={`hylo-card hylo-card--${category}`}>
                     <div className={`hylo-card-overlay hylo-card-overlay--${category}`} />
 
                     <div className="hylo-card-content">
