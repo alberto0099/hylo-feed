@@ -17,6 +17,7 @@ const MAP = {
   actividades: { emoji: "📆", label: "Actividades" },
   market: { emoji: "🛒", label: "Mercado" },
   eventos: { emoji: "🏟️", label: "Eventos" },
+  objetos_perdidos: { emoji: "🔍", label: "Objetos perdidos" },
 } as const;
 
 type CategoryKey = keyof typeof MAP;
@@ -46,11 +47,22 @@ function formatFeedDate(iso: string) {
   const startAnteayer = new Date(startToday);
   startAnteayer.setDate(startAnteayer.getDate() - 2);
 
-  if (d >= startToday) return "Hoy";
-  if (d >= startYesterday) return "Ayer";
-  if (d >= startAnteayer) return "Anteayer";
+  const time = d.toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
-  return d.toLocaleDateString("es-ES");
+  if (d >= startToday) return `Hoy   ${time}`;
+  if (d >= startYesterday) return `Ayer   ${time}`;
+  if (d >= startAnteayer) return `Anteayer   ${time}`;
+
+  const fullDate = d.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  return `${fullDate}   ${time}`;
 }
 
 export default function App() {
@@ -181,6 +193,7 @@ export default function App() {
               opacity: 0.85,
               fontWeight: 500,
               marginTop: hasImage ? 3 : 4,
+              whiteSpace: "pre",
             }}
           >
             {formatFeedDate(r.created_at)}
@@ -519,3 +532,4 @@ export default function App() {
     </div>
   );
 }
+

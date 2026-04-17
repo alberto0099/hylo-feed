@@ -1,12 +1,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700;800&display=swap");
 
-:root{
-  --bg:#0b0b0f;
-  --card:#2a2a2a;
-  --text:rgba(255,255,255,.92);
-  --muted:rgba(255,255,255,.72);
+/* =========================================================
+   ROOT
+========================================================= */
+:root {
+  --bg: #0b0b0f;
+  --card: #2a2a2a;
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.72);
 }
 
+/* =========================================================
+   RESET
+========================================================= */
 * {
   box-sizing: border-box;
 }
@@ -68,6 +74,9 @@ img {
   display: block;
 }
 
+/* =========================================================
+   APP SHELL
+========================================================= */
 .app-shell {
   width: 100%;
   min-height: 100vh;
@@ -76,7 +85,9 @@ img {
   overflow-x: hidden;
 }
 
-/* FONDO HYLO PANEL */
+/* =========================================================
+   BACKGROUND ORBS
+========================================================= */
 .bg-orb {
   position: fixed;
   border-radius: 999px;
@@ -111,6 +122,9 @@ img {
   background: rgba(255, 170, 210, 0.12);
 }
 
+/* =========================================================
+   PARTICLES
+========================================================= */
 .particles {
   position: fixed;
   inset: 0;
@@ -160,6 +174,9 @@ img {
   }
 }
 
+/* =========================================================
+   LAYOUT
+========================================================= */
 .hylo-wrap {
   width: 100%;
   min-height: 100vh;
@@ -170,7 +187,7 @@ img {
   z-index: 1;
 }
 
-.hylo-grid{
+.hylo-grid {
   position: relative;
   display: grid;
   grid-template-columns: 1fr;
@@ -179,21 +196,22 @@ img {
   overflow: visible;
 }
 
-.hylo-empty{
+.hylo-empty {
   position: relative;
   z-index: 0;
-  background: linear-gradient(180deg, rgba(34,34,40,0.96) 0%, rgba(18,18,22,0.985) 100%);
+  background: linear-gradient(180deg, rgba(34, 34, 40, 0.96) 0%, rgba(18, 18, 22, 0.985) 100%);
   border-radius: 18px;
   padding: 18px 16px;
-  box-shadow: 0 18px 40px rgba(0,0,0,.14);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.14);
   text-align: center;
   font-size: 13px;
-  color: rgba(255,255,255,.75);
+  color: rgba(255, 255, 255, 0.75);
 }
 
-/* BLOQUE COMPLETO: HYLO + PROMO */
-/* SEPARACIÓN BESTIA ENTRE HYL0S */
-.hylo-item{
+/* =========================================================
+   HYLO ITEM SPACING
+========================================================= */
+.hylo-item {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -202,119 +220,110 @@ img {
   padding-bottom: 70px;
 }
 
-/* 👉 SOLO EL PRIMER HYLO */
-.hylo-item:first-child{
+.hylo-item:first-child {
   margin-top: 200px;
 }
 
-/* CARD */
-.hylo-card{
+/* =========================================================
+   CARD BASE
+========================================================= */
+.hylo-card {
   position: relative;
   z-index: 0;
   border-radius: 24px;
   padding: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.20);
-  background: linear-gradient(180deg, rgba(34,34,40,0.96) 0%, rgba(18,18,22,0.985) 100%);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.20);
+  background: linear-gradient(180deg, rgba(34, 34, 40, 0.96) 0%, rgba(18, 18, 22, 0.985) 100%);
 }
 
-.hylo-card--crushes{
-  background:
-    radial-gradient(circle at top left, rgba(244,178,230,0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(46,32,44,0.98) 0%, rgba(20,16,24,0.99) 100%);
-}
-
-.hylo-card--apuntes{
-  background:
-    radial-gradient(circle at top left, rgba(120,170,255,0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(28,36,52,0.98) 0%, rgba(15,19,28,0.99) 100%);
-}
-
-.hylo-card--fiestas{
-  background:
-    radial-gradient(circle at top left, rgba(255,120,120,0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(52,28,34,0.98) 0%, rgba(24,14,18,0.99) 100%);
-}
-
-.hylo-card--pisos{
-  background:
-    radial-gradient(circle at top left, rgba(120,220,150,0.15) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(30,42,34,0.98) 0%, rgba(15,22,18,0.99) 100%);
-}
-
-.hylo-card--actividades{
-  background:
-    radial-gradient(circle at top left, rgba(255,190,90,0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(50,38,28,0.98) 0%, rgba(22,18,14,0.99) 100%);
-}
-
-.hylo-card--market{
-  background:
-    radial-gradient(circle at top left, rgba(190,140,255,0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(38,30,52,0.98) 0%, rgba(18,15,28,0.99) 100%);
-}
-
-.hylo-card--eventos{
-  background:
-    radial-gradient(circle at top left, rgba(110,220,255,0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(28,40,48,0.98) 0%, rgba(14,20,24,0.99) 100%);
-}
-
-.hylo-card--eventos .hylo-author{
-  color: rgba(190, 240, 255, 0.88);
-}
-
-.hylo-card--eventos .hylo-time{
-  color: rgba(170, 235, 255, 0.82);
-  opacity: 1;
-}
-
-.hylo-card--eventos .hylo-body{
-  color: rgba(255,255,255,0.96);
-}
-
-.hylo-card-content{
+.hylo-card-content {
   position: relative;
   z-index: 1;
 }
 
-.hylo-card-overlay{
+.hylo-card-overlay {
   position: absolute;
   inset: 0;
   border-radius: 24px;
   pointer-events: none;
 }
 
-.hylo-card-overlay--crushes{
-  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+/* =========================================================
+   CATEGORY CARDS
+========================================================= */
+.hylo-card--crushes {
+  background:
+    radial-gradient(circle at top left, rgba(244, 178, 230, 0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(46, 32, 44, 0.98) 0%, rgba(20, 16, 24, 0.99) 100%);
 }
 
-.hylo-card-overlay--apuntes{
-  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+.hylo-card--apuntes {
+  background:
+    radial-gradient(circle at top left, rgba(120, 170, 255, 0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(28, 36, 52, 0.98) 0%, rgba(15, 19, 28, 0.99) 100%);
 }
 
-.hylo-card-overlay--actividades{
-  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+.hylo-card--fiestas {
+  background:
+    radial-gradient(circle at top left, rgba(255, 120, 120, 0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(52, 28, 34, 0.98) 0%, rgba(24, 14, 18, 0.99) 100%);
 }
 
-.hylo-card-overlay--pisos{
-  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+.hylo-card--pisos {
+  background:
+    radial-gradient(circle at top left, rgba(120, 220, 150, 0.15) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(30, 42, 34, 0.98) 0%, rgba(15, 22, 18, 0.99) 100%);
 }
 
-.hylo-card-overlay--market{
-  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+.hylo-card--actividades {
+  background:
+    radial-gradient(circle at top left, rgba(255, 190, 90, 0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(50, 38, 28, 0.98) 0%, rgba(22, 18, 14, 0.99) 100%);
 }
 
-.hylo-card-overlay--fiestas{
-  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+.hylo-card--market {
+  background:
+    radial-gradient(circle at top left, rgba(190, 140, 255, 0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(38, 30, 52, 0.98) 0%, rgba(18, 15, 28, 0.99) 100%);
 }
 
-.hylo-card-overlay--eventos{
-  background: radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%);
+.hylo-card--eventos {
+  background:
+    radial-gradient(circle at top left, rgba(110, 220, 255, 0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(28, 40, 48, 0.98) 0%, rgba(14, 20, 24, 0.99) 100%);
 }
 
-/* BADGE */
-.hylo-badge{
+.hylo-card--eventos .hylo-author {
+  color: rgba(190, 240, 255, 0.88);
+}
+
+.hylo-card--eventos .hylo-time {
+  color: rgba(170, 235, 255, 0.82);
+  opacity: 1;
+}
+
+.hylo-card--eventos .hylo-body {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+/* =========================================================
+   CARD OVERLAYS
+========================================================= */
+.hylo-card-overlay--crushes,
+.hylo-card-overlay--apuntes,
+.hylo-card-overlay--actividades,
+.hylo-card-overlay--pisos,
+.hylo-card-overlay--market,
+.hylo-card-overlay--fiestas,
+.hylo-card-overlay--eventos {
+  background: radial-gradient(circle at top left, rgba(244, 178, 230, 0.18) 0%, rgba(244, 178, 230, 0.07) 26%, transparent 56%);
+}
+
+/* =========================================================
+   BADGES
+========================================================= */
+.hylo-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -330,7 +339,7 @@ img {
   z-index: 1;
 }
 
-.hylo-badge-emoji{
+.hylo-badge-emoji {
   width: 18px;
   height: 18px;
   display: inline-flex;
@@ -341,77 +350,80 @@ img {
   line-height: 1;
 }
 
-.hylo-badge--crushes{
-  background: rgba(244,178,230,0.12);
-  border: 1px solid rgba(244,178,230,0.25);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(244,178,230,0.10);
+.hylo-badge--crushes {
+  background: rgba(244, 178, 230, 0.12);
+  border: 1px solid rgba(244, 178, 230, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(244, 178, 230, 0.10);
   color: #f0a8df;
 }
 
-.hylo-badge--apuntes{
-  background: rgba(120,170,255,0.12);
-  border: 1px solid rgba(120,170,255,0.25);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(120,170,255,0.10);
+.hylo-badge--apuntes {
+  background: rgba(120, 170, 255, 0.12);
+  border: 1px solid rgba(120, 170, 255, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(120, 170, 255, 0.10);
   color: #9fc0ff;
 }
 
-.hylo-badge--actividades{
-  background: rgba(255,190,90,0.12);
-  border: 1px solid rgba(255,190,90,0.25);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(255,190,90,0.10);
+.hylo-badge--actividades {
+  background: rgba(255, 190, 90, 0.12);
+  border: 1px solid rgba(255, 190, 90, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(255, 190, 90, 0.10);
   color: #ffcb72;
 }
 
-.hylo-badge--pisos{
-  background: rgba(120,220,150,0.12);
-  border: 1px solid rgba(120,220,150,0.25);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(120,220,150,0.10);
+.hylo-badge--pisos {
+  background: rgba(120, 220, 150, 0.12);
+  border: 1px solid rgba(120, 220, 150, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(120, 220, 150, 0.10);
   color: #8fe0b0;
 }
 
-.hylo-badge--market{
-  background: rgba(190,140,255,0.12);
-  border: 1px solid rgba(190,140,255,0.25);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(190,140,255,0.10);
+.hylo-badge--market {
+  background: rgba(190, 140, 255, 0.12);
+  border: 1px solid rgba(190, 140, 255, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(190, 140, 255, 0.10);
   color: #b9a7ff;
 }
 
-.hylo-badge--fiestas{
-  background: rgba(255,120,120,0.12);
-  border: 1px solid rgba(255,120,120,0.25);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(255,120,120,0.10);
+.hylo-badge--fiestas {
+  background: rgba(255, 120, 120, 0.12);
+  border: 1px solid rgba(255, 120, 120, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(255, 120, 120, 0.10);
   color: #ff9ca8;
 }
 
-.hylo-badge--eventos{
-  background: rgba(110,220,255,0.14);
-  border: 1px solid rgba(110,220,255,0.28);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(110,220,255,0.12);
+.hylo-badge--eventos {
+  background: rgba(110, 220, 255, 0.14);
+  border: 1px solid rgba(110, 220, 255, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(110, 220, 255, 0.12);
   color: #8fe8ff;
 }
 
-/* META */
-.hylo-meta{
+/* =========================================================
+   META / AUTHOR / DATE + TIME
+========================================================= */
+.hylo-meta {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   margin-top: 10px;
 }
 
-.hylo-authorline{
+.hylo-authorline {
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
+  flex: 1;
 }
 
-.hylo-author{
+.hylo-author {
   font-size: 14px;
   font-weight: 600;
-  color: rgba(255,255,255,.75);
+  color: rgba(255, 255, 255, 0.75);
   margin: 5px 0 2px 0;
-  opacity: .95;
+  opacity: 0.95;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -420,21 +432,34 @@ img {
   text-overflow: ellipsis;
 }
 
-.hylo-time{
+.hylo-time {
   font-size: 11px;
-  opacity: .75;
-  font-weight: 400;
-  margin-top: 6px;
-  margin-bottom: 0;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
+  opacity: 0.9;
+  margin: 0;
   flex-shrink: 0;
   white-space: nowrap;
+  text-align: right;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
 }
 
-/* BODY */
-.hylo-body{
+/* Si quieres separar fecha y hora con un puntito */
+.hylo-time .time-separator {
+  opacity: 0.55;
+  font-size: 10px;
+}
+
+/* =========================================================
+   BODY
+========================================================= */
+.hylo-body {
   font-size: 15px;
   line-height: 1.32;
-  color: rgba(255,255,255,.95);
+  color: rgba(255, 255, 255, 0.95);
   margin-top: 4px;
   margin-bottom: 0;
   white-space: pre-wrap;
@@ -442,8 +467,10 @@ img {
   font-weight: 400;
 }
 
-/* IMAGEN */
-.hylo-post-img{
+/* =========================================================
+   POST IMAGE
+========================================================= */
+.hylo-post-img {
   width: 100%;
   max-height: 380px;
   border-radius: 16px;
@@ -455,15 +482,17 @@ img {
   background: transparent;
 }
 
-/* PROMO FUERA DEL HYLO */
-.hylo-promo-outside{
+/* =========================================================
+   PROMO OUTSIDE
+========================================================= */
+.hylo-promo-outside {
   width: 100%;
   margin-top: 8px;
   display: flex;
   justify-content: center;
 }
 
-.hylo-promo-img{
+.hylo-promo-img {
   width: 100%;
   max-width: 100%;
   height: auto;
@@ -476,49 +505,60 @@ img {
   image-rendering: auto;
 }
 
-/* MOBILE */
-@media (max-width: 480px){
-  .hylo-wrap{
+/* =========================================================
+   MOBILE
+========================================================= */
+@media (max-width: 480px) {
+  .hylo-wrap {
     max-width: none;
     padding: 8px 0 16px;
   }
 
-  .hylo-grid{
+  .hylo-grid {
     gap: 0;
     padding: 0 12px;
   }
 
-  .hylo-card{
+  .hylo-card {
     border-radius: 24px;
     padding: 20px;
   }
 
-  .hylo-post-img{
+  .hylo-post-img {
     max-height: 260px;
   }
 
-  .hylo-item{
+  .hylo-item {
     margin-bottom: 100px;
   }
 
-  .hylo-promo-outside{
+  .hylo-promo-outside {
     margin-top: 8px;
+  }
+
+  .hylo-meta {
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hylo-time {
+    font-size: 10.5px;
   }
 }
 
-/* 🔥 HYLOS CON IMAGEN MÁS COMPACTOS */
+/* =========================================================
+   IMAGE POSTS COMPACT
+========================================================= */
 .hylo-item--image {
   padding-top: 40px;
   padding-bottom: 40px;
 }
 
-/* Card más pequeña */
 .hylo-item--image .hylo-card {
   padding: 16px;
   border-radius: 20px;
 }
 
-/* Texto más pequeño */
 .hylo-item--image .hylo-body {
   font-size: 14px;
 }
@@ -531,19 +571,16 @@ img {
   font-size: 11px;
 }
 
-/* Badge más pequeño */
 .hylo-item--image .hylo-badge {
   font-size: 12px;
   padding: 4px 10px;
 }
 
-/* Imagen más pequeña */
 .hylo-item--image img {
   max-height: 220px;
   border-radius: 20px;
 }
 
-/* Promo más compacta */
 .hylo-item--image .hylo-promo-slot {
   transform: scale(0.92);
   transform-origin: top center;
