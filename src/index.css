@@ -294,6 +294,12 @@ img {
     linear-gradient(180deg, rgba(28, 40, 48, 0.98) 0%, rgba(14, 20, 24, 0.99) 100%);
 }
 
+.hylo-card--objetos_perdidos {
+  background:
+    radial-gradient(circle at top left, rgba(110, 255, 210, 0.16) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(24, 46, 42, 0.98) 0%, rgba(12, 24, 22, 0.99) 100%);
+}
+
 .hylo-card--eventos .hylo-author {
   color: rgba(190, 240, 255, 0.88);
 }
@@ -304,6 +310,19 @@ img {
 }
 
 .hylo-card--eventos .hylo-body {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.hylo-card--objetos_perdidos .hylo-author {
+  color: rgba(220, 255, 245, 0.88);
+}
+
+.hylo-card--objetos_perdidos .hylo-time {
+  color: rgba(195, 255, 238, 0.82);
+  opacity: 1;
+}
+
+.hylo-card--objetos_perdidos .hylo-body {
   color: rgba(255, 255, 255, 0.96);
 }
 
@@ -318,6 +337,10 @@ img {
 .hylo-card-overlay--fiestas,
 .hylo-card-overlay--eventos {
   background: radial-gradient(circle at top left, rgba(244, 178, 230, 0.18) 0%, rgba(244, 178, 230, 0.07) 26%, transparent 56%);
+}
+
+.hylo-card-overlay--objetos_perdidos {
+  background: radial-gradient(circle at top left, rgba(110, 255, 210, 0.18) 0%, rgba(110, 255, 210, 0.07) 26%, transparent 56%);
 }
 
 /* =========================================================
@@ -397,6 +420,13 @@ img {
   border: 1px solid rgba(110, 220, 255, 0.28);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(110, 220, 255, 0.12);
   color: #8fe8ff;
+}
+
+.hylo-badge--objetos_perdidos {
+  background: rgba(110, 255, 210, 0.14);
+  border: 1px solid rgba(110, 255, 210, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(110, 255, 210, 0.12);
+  color: #9effdf;
 }
 
 /* =========================================================
