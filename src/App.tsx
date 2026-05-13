@@ -22,6 +22,8 @@ const MAP = {
 
 type CategoryKey = keyof typeof MAP;
 
+const PROMO_SWITCH_AT = new Date(2026, 4, 13, 19, 0, 0).getTime();
+
 type PanelPostRow = {
   id: number;
   name: string | null;
@@ -69,6 +71,10 @@ export default function App() {
   const [rows, setRows] = useState<PanelPostRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [openImageUrl, setOpenImageUrl] = useState<string | null>(null);
+  const [nowMs, setNowMs] = useState(() => Date.now());
+
+  const promoSrc =
+    nowMs >= PROMO_SWITCH_AT ? "/hylo-promo5.png" : "/hylo-promo.png";
 
   const particles = useMemo(() => Array.from({ length: 24 }), []);
   const captureRefs = useRef<Record<number, HTMLDivElement | null>>({});
@@ -124,6 +130,16 @@ export default function App() {
       window.clearInterval(intervalId);
     };
   }, []);
+
+  useEffect(() => {
+    if (nowMs >= PROMO_SWITCH_AT) return;
+    const tickId = window.setInterval(() => {
+      setNowMs(Date.now());
+    }, 30000);
+    return () => {
+      window.clearInterval(tickId);
+    };
+  }, [nowMs]);
 
   function renderHyloContent(
     r: PanelPostRow,
@@ -326,7 +342,7 @@ export default function App() {
 
                   <div className="hylo-promo-slot">
                     <img
-                      src="/hylo-promo5.png"
+                      src={promoSrc}
                       alt="Hylo promo"
                       className="hylo-promo-img"
                     />
@@ -452,7 +468,7 @@ export default function App() {
                         }}
                       >
                         <img
-                          src="/hylo-promo5.png"
+                          src={promoSrc}
                           alt="Hylo promo"
                           crossOrigin="anonymous"
                           style={{
