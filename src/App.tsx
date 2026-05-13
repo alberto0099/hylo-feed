@@ -326,7 +326,7 @@ export default function App() {
 
                   <div className="hylo-promo-slot">
                     <img
-                      src="/hylo-promo.png"
+                      src="/hylo-promo5.png"
                       alt="Hylo promo"
                       className="hylo-promo-img"
                     />
@@ -452,7 +452,7 @@ export default function App() {
                         }}
                       >
                         <img
-                          src="/hylo-promo.png"
+                          src="/hylo-promo5.png"
                           alt="Hylo promo"
                           crossOrigin="anonymous"
                           style={{
