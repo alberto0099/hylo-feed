@@ -4,7 +4,7 @@
    ROOT
 ========================================================= */
 :root {
-  --bg: #0b0b0f;
+  --bg: #db92c9;
   --card: #2a2a2a;
   --text: rgba(255, 255, 255, 0.92);
   --muted: rgba(255, 255, 255, 0.72);
@@ -24,16 +24,17 @@ body,
   padding: 0;
   width: 100%;
   min-height: 100%;
-  background: #0b0b0f;
+  background: #000000;
   overflow-x: hidden;
+}
+
+html {
+  scrollbar-gutter: stable both-edges;
 }
 
 body {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top center, rgba(255, 120, 210, 0.10) 0%, transparent 26%),
-    radial-gradient(circle at bottom center, rgba(190, 110, 255, 0.10) 0%, transparent 30%),
-    linear-gradient(180deg, #04040a 0%, #090913 42%, #05050a 100%);
+  background: #000000;
   color: var(--text);
   font-family:
     "Raleway",
@@ -80,7 +81,7 @@ img {
 .app-shell {
   width: 100%;
   min-height: 100vh;
-  background: transparent;
+  background: #000000;
   position: relative;
   overflow-x: hidden;
 }
@@ -95,6 +96,7 @@ img {
   pointer-events: none;
   opacity: 0.55;
   z-index: 0;
+  display: none;
 }
 
 .bg-orb-1 {
@@ -131,6 +133,7 @@ img {
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
+  display: none;
 }
 
 .particle {
@@ -212,12 +215,40 @@ img {
    HYLO ITEM SPACING
 ========================================================= */
 .hylo-item {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  padding-top: 70px;
-  padding-bottom: 70px;
+  min-height: 640px;
+  padding-top: 56px;
+  padding-bottom: 56px;
+  box-sizing: border-box;
+}
+
+.hylo-item::before {
+  content: "";
+  position: absolute;
+  left: -28px;
+  right: -28px;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)) top center / 100% 1px no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)) left center / 1px 100% no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)) right center / 1px 100% no-repeat;
+}
+
+.hylo-item::after {
+  content: "";
+  position: absolute;
+  left: -28px;
+  right: -28px;
+  bottom: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
 }
 
 .hylo-item:first-child {
@@ -230,16 +261,19 @@ img {
 .hylo-card {
   position: relative;
   z-index: 0;
-  border-radius: 24px;
-  padding: 20px;
+  border-radius: 32px;
+  padding: 22px 18px 18px;
   overflow: hidden;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.20);
-  background: linear-gradient(180deg, rgba(34, 34, 40, 0.96) 0%, rgba(18, 18, 22, 0.985) 100%);
+  box-shadow: none;
+  background: #2b2b33;
+  transform: scale(0.94);
+  transform-origin: center center;
 }
 
 .hylo-card-content {
   position: relative;
   z-index: 1;
+  padding-left: 8px;
 }
 
 .hylo-card-overlay {
@@ -247,66 +281,32 @@ img {
   inset: 0;
   border-radius: 24px;
   pointer-events: none;
+  display: none;
 }
 
 /* =========================================================
    CATEGORY CARDS
 ========================================================= */
-.hylo-card--crushes {
-  background:
-    radial-gradient(circle at top left, rgba(244, 178, 230, 0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(46, 32, 44, 0.98) 0%, rgba(20, 16, 24, 0.99) 100%);
-}
-
-.hylo-card--apuntes {
-  background:
-    radial-gradient(circle at top left, rgba(120, 170, 255, 0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(28, 36, 52, 0.98) 0%, rgba(15, 19, 28, 0.99) 100%);
-}
-
-.hylo-card--fiestas {
-  background:
-    radial-gradient(circle at top left, rgba(255, 120, 120, 0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(52, 28, 34, 0.98) 0%, rgba(24, 14, 18, 0.99) 100%);
-}
-
-.hylo-card--pisos {
-  background:
-    radial-gradient(circle at top left, rgba(120, 220, 150, 0.15) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(30, 42, 34, 0.98) 0%, rgba(15, 22, 18, 0.99) 100%);
-}
-
-.hylo-card--actividades {
-  background:
-    radial-gradient(circle at top left, rgba(255, 190, 90, 0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(50, 38, 28, 0.98) 0%, rgba(22, 18, 14, 0.99) 100%);
-}
-
-.hylo-card--market {
-  background:
-    radial-gradient(circle at top left, rgba(190, 140, 255, 0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(38, 30, 52, 0.98) 0%, rgba(18, 15, 28, 0.99) 100%);
-}
-
-.hylo-card--eventos {
-  background:
-    radial-gradient(circle at top left, rgba(110, 220, 255, 0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(28, 40, 48, 0.98) 0%, rgba(14, 20, 24, 0.99) 100%);
-}
-
+.hylo-card--crushes,
+.hylo-card--apuntes,
+.hylo-card--fiestas,
+.hylo-card--pisos,
+.hylo-card--actividades,
+.hylo-card--market,
+.hylo-card--eventos,
+.hylo-card--oportunidades,
+.hylo-card--general,
 .hylo-card--objetos_perdidos {
-  background:
-    radial-gradient(circle at top left, rgba(110, 255, 210, 0.16) 0%, transparent 38%),
-    linear-gradient(180deg, rgba(24, 46, 42, 0.98) 0%, rgba(12, 24, 22, 0.99) 100%);
+  background: #2b2b33;
 }
 
 .hylo-card--eventos .hylo-author {
-  color: rgba(190, 240, 255, 0.88);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .hylo-card--eventos .hylo-time {
-  color: rgba(170, 235, 255, 0.82);
-  opacity: 1;
+  color: rgba(255, 255, 255, 0.72);
+  opacity: 0.9;
 }
 
 .hylo-card--eventos .hylo-body {
@@ -326,21 +326,67 @@ img {
   color: rgba(255, 255, 255, 0.96);
 }
 
+.hylo-logo-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.hylo-bottom-logo {
+  width: 130px;
+  max-width: 42%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}
+
 /* =========================================================
    CARD OVERLAYS
 ========================================================= */
-.hylo-card-overlay--crushes,
-.hylo-card-overlay--apuntes,
-.hylo-card-overlay--actividades,
-.hylo-card-overlay--pisos,
-.hylo-card-overlay--market,
-.hylo-card-overlay--fiestas,
-.hylo-card-overlay--eventos {
-  background: radial-gradient(circle at top left, rgba(244, 178, 230, 0.18) 0%, rgba(244, 178, 230, 0.07) 26%, transparent 56%);
+.hylo-card-overlay--crushes {
+  background: none;
 }
 
-.hylo-card-overlay--objetos_perdidos {
-  background: radial-gradient(circle at top left, rgba(110, 255, 210, 0.18) 0%, rgba(110, 255, 210, 0.07) 26%, transparent 56%);
+.hylo-card-overlay--apuntes {
+  background: none;
+}
+
+.hylo-card-overlay--actividades {
+  background: none;
+}
+
+.hylo-card-overlay--pisos {
+  background: none;
+}
+
+.hylo-card-overlay--market {
+  background: none;
+}
+
+.hylo-card-overlay--oportunidades {
+  background: none;
+}
+
+.hylo-card-overlay--general {
+  background: none;
+}
+
+.hylo-card-overlay--fiestas {
+  background: none;
+}
+
+.hylo-card-overlay--objetos_perdidos,
+.hylo-card-overlay--eventos {
+  background: none;
 }
 
 /* =========================================================
@@ -350,7 +396,7 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 11px;
+  padding: 3px 11px;
   border-radius: 999px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -374,58 +420,72 @@ img {
 }
 
 .hylo-badge--crushes {
-  background: rgba(244, 178, 230, 0.12);
-  border: 1px solid rgba(244, 178, 230, 0.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(244, 178, 230, 0.10);
+  background: rgba(244, 178, 230, 0.20);
+  border: 0;
+  box-shadow: none;
   color: #f0a8df;
 }
 
 .hylo-badge--apuntes {
-  background: rgba(120, 170, 255, 0.12);
-  border: 1px solid rgba(120, 170, 255, 0.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(120, 170, 255, 0.10);
+  background: rgba(120, 170, 255, 0.20);
+  border: 0;
+  box-shadow: none;
   color: #9fc0ff;
 }
 
 .hylo-badge--actividades {
-  background: rgba(255, 190, 90, 0.12);
-  border: 1px solid rgba(255, 190, 90, 0.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(255, 190, 90, 0.10);
+  background: rgba(255, 190, 90, 0.20);
+  border: 0;
+  box-shadow: none;
   color: #ffcb72;
 }
 
 .hylo-badge--pisos {
-  background: rgba(120, 220, 150, 0.12);
-  border: 1px solid rgba(120, 220, 150, 0.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(120, 220, 150, 0.10);
+  background: rgba(120, 220, 150, 0.20);
+  border: 0;
+  box-shadow: none;
   color: #8fe0b0;
 }
 
 .hylo-badge--market {
-  background: rgba(190, 140, 255, 0.12);
-  border: 1px solid rgba(190, 140, 255, 0.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(190, 140, 255, 0.10);
+  background: rgba(190, 140, 255, 0.20);
+  border: 0;
+  box-shadow: none;
   color: #b9a7ff;
 }
 
 .hylo-badge--fiestas {
-  background: rgba(255, 120, 120, 0.12);
-  border: 1px solid rgba(255, 120, 120, 0.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(255, 120, 120, 0.10);
+  background: rgba(255, 120, 120, 0.20);
+  border: 0;
+  box-shadow: none;
   color: #ff9ca8;
 }
 
 .hylo-badge--eventos {
-  background: rgba(110, 220, 255, 0.14);
-  border: 1px solid rgba(110, 220, 255, 0.28);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(110, 220, 255, 0.12);
+  background: rgba(110, 220, 255, 0.22);
+  border: 0;
+  box-shadow: none;
   color: #8fe8ff;
 }
 
+.hylo-badge--oportunidades {
+  background: rgba(214, 255, 96, 0.18);
+  border: 0;
+  box-shadow: none;
+  color: #ddff7a;
+}
+
+.hylo-badge--general {
+  background: rgba(255, 255, 255, 0.16);
+  border: 0;
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.86);
+}
+
 .hylo-badge--objetos_perdidos {
-  background: rgba(110, 255, 210, 0.14);
-  border: 1px solid rgba(110, 255, 210, 0.28);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 12px rgba(110, 255, 210, 0.12);
+  background: rgba(110, 255, 210, 0.22);
+  border: 0;
+  box-shadow: none;
   color: #9effdf;
 }
 
@@ -468,6 +528,7 @@ img {
   color: rgba(255, 255, 255, 0.72);
   opacity: 0.9;
   margin: 0;
+  transform: translateX(-6px);
   flex-shrink: 0;
   white-space: nowrap;
   text-align: right;
@@ -490,11 +551,38 @@ img {
   font-size: 15px;
   line-height: 1.32;
   color: rgba(255, 255, 255, 0.95);
-  margin-top: 4px;
+  margin-top: 12px;
   margin-bottom: 0;
   white-space: pre-wrap;
   word-break: break-word;
   font-weight: 400;
+}
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+.hylo-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 18px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.hylo-action {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  line-height: 1;
+  cursor: default;
 }
 
 /* =========================================================
@@ -513,29 +601,6 @@ img {
 }
 
 /* =========================================================
-   PROMO OUTSIDE
-========================================================= */
-.hylo-promo-outside {
-  width: 100%;
-  margin-top: 8px;
-  display: flex;
-  justify-content: center;
-}
-
-.hylo-promo-img {
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  display: block;
-  object-fit: contain;
-  border: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  image-rendering: auto;
-}
-
-/* =========================================================
    MOBILE
 ========================================================= */
 @media (max-width: 480px) {
@@ -551,7 +616,7 @@ img {
 
   .hylo-card {
     border-radius: 24px;
-    padding: 20px;
+    padding: 24px 20px 20px;
   }
 
   .hylo-post-img {
@@ -559,11 +624,8 @@ img {
   }
 
   .hylo-item {
-    margin-bottom: 100px;
-  }
-
-  .hylo-promo-outside {
-    margin-top: 8px;
+    min-height: 600px;
+    margin-bottom: 0;
   }
 
   .hylo-meta {
@@ -580,13 +642,13 @@ img {
    IMAGE POSTS COMPACT
 ========================================================= */
 .hylo-item--image {
-  padding-top: 40px;
-  padding-bottom: 40px;
+  padding-top: 56px;
+  padding-bottom: 56px;
 }
 
 .hylo-item--image .hylo-card {
-  padding: 16px;
-  border-radius: 20px;
+  padding: 18px 15px 15px;
+  border-radius: 28px;
 }
 
 .hylo-item--image .hylo-body {
@@ -603,16 +665,10 @@ img {
 
 .hylo-item--image .hylo-badge {
   font-size: 12px;
-  padding: 4px 10px;
+  padding: 3px 10px;
 }
 
 .hylo-item--image img {
-  max-height: 220px;
+  max-height: 200px;
   border-radius: 20px;
-}
-
-.hylo-item--image .hylo-promo-slot {
-  transform: scale(0.92);
-  transform-origin: top center;
-  margin-top: 4px;
 }
