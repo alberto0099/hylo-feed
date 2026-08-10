@@ -634,8 +634,11 @@ export default function App() {
                     </div>
                   </article>
 
-                  <div className="hylo-logo-slot" aria-hidden="true">
-                    <img src="/hylo_logospain.png" alt="" className="hylo-bottom-logo" />
+                  <div className="hylo-cta-slot" aria-hidden="true">
+                    <span className="hylo-cta">
+                      Descarga <img src="/hylo_logo.png" alt="Hylo" className="hylo-cta-logo" />.
+                      Tu campus ya está dentro.
+                    </span>
                   </div>
 
                   <div
@@ -649,7 +652,8 @@ export default function App() {
                       width: 1080,
                       height: 1350,
                       overflow: "hidden",
-                      background: "#000000",
+                      background:
+                        "radial-gradient(circle at top center, rgba(255, 120, 210, 0.10) 0%, transparent 26%), radial-gradient(circle at bottom center, rgba(190, 110, 255, 0.10) 0%, transparent 30%), linear-gradient(180deg, #04040a 0%, #090913 42%, #05050a 100%)",
                       color: "white",
                       fontFamily: "Raleway, system-ui, sans-serif",
                       padding: 72,
@@ -693,7 +697,8 @@ export default function App() {
                               inset: 0,
                               borderRadius: 56,
                               pointerEvents: "none",
-                              background: "transparent",
+                              background:
+                                "radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%)",
                             }}
                           />
 
@@ -710,6 +715,30 @@ export default function App() {
                             })}
                           </div>
                         </article>
+                      </div>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 12,
+                          fontFamily: "Raleway, system-ui, sans-serif",
+                          fontWeight: 700,
+                          fontSize: 40,
+                          letterSpacing: "-0.01em",
+                          color: "rgba(255,255,255,0.92)",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        <span>Descarga</span>
+                        <img
+                          src="/hylo_logo.png"
+                          alt="Hylo"
+                          style={{ height: 40, width: "auto", display: "block",
+                                   transform: "translateY(4px)" }}
+                        />
+                        <span>. Tu campus ya está dentro.</span>
                       </div>
 
                     </div>
