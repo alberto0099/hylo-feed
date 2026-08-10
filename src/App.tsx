@@ -248,6 +248,13 @@ function Heart({ filled }: { filled: boolean }) {
   );
 }
 
+// El logotipo va DENTRO de la frase del CTA. MEDIDO sobre el propio PNG: su
+// línea de base está al 72,7% de la altura, así que el 27,3% es cola de la
+// "y". Para que se apoye donde se apoya el texto hay que bajarlo ese 27,3%.
+// Cambia SOLO el alto: la bajada se recalcula.
+const LOGO_CTA_ALTO = 100;
+const LOGO_CTA_BAJADA = Math.round(LOGO_CTA_ALTO * 0.273);
+
 export default function App() {
   const [rows, setRows] = useState<PanelPostRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -446,31 +453,49 @@ export default function App() {
           className="hylo-meta"
           style={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            gap: 4,
             marginTop: meta ? (hasImage ? 8 : 10) : 0,
           }}
         >
+          {/* MISMO patrón que la app (components/HyloCard.tsx): nombre, un
+              círculo de 2px como separador, y la hora JUNTO al nombre — no
+              empujada al extremo derecho. Mismo tamaño de letra que el nombre;
+              lo que cambia es el peso y el gris. */}
           <div className="hylo-authorline">
             <div
               className="hylo-author"
               style={{
                 fontSize: capture ? 16 : hasImage ? 14 : 16,
                 fontWeight: 600,
-                marginTop: hasImage ? 3 : 4,
               }}
             >
               {authorName}
             </div>
           </div>
 
+          <span
+            aria-hidden="true"
+            style={{
+              width: 2,
+              height: 2,
+              borderRadius: 999,
+              background: "rgba(255,255,255,0.5)",
+              margin: "0 1px",
+              flexShrink: 0,
+              transform: "translateY(1px)",
+            }}
+          />
+
           <div
             className="hylo-time"
             style={{
-              fontSize: capture ? 13 : hasImage ? 12 : 13,
-              opacity: 0.85,
-              fontWeight: 500,
-              marginTop: hasImage ? 3 : 4,
+              fontSize: capture ? 16 : hasImage ? 14 : 16,
+              fontWeight: 400,
+              color: "rgba(255,255,255,0.5)",
+              opacity: 1,
+              flexShrink: 0,
               whiteSpace: "pre",
             }}
           >
@@ -720,23 +745,32 @@ export default function App() {
                       <div
                         style={{
                           display: "flex",
-                          alignItems: "center",
+                          alignItems: "baseline",
                           justifyContent: "center",
-                          gap: 12,
+                          gap: 9,
                           fontFamily: "Raleway, system-ui, sans-serif",
-                          fontWeight: 700,
-                          fontSize: 40,
+                          fontWeight: 600,
+                          fontSize: 52,
                           letterSpacing: "-0.01em",
                           color: "rgba(255,255,255,0.92)",
                           whiteSpace: "nowrap",
+                          background: "#212128",
+                          // Sangra los 72px de padding del lienzo para llegar a
+                          // los bordes de la imagen, sin pasarse de ellos.
+                          margin: "0 -72px -72px",
+                          padding: "34px 44px",
                         }}
                       >
                         <span>Descarga</span>
                         <img
                           src="/hylo_logo.png"
                           alt="Hylo"
-                          style={{ height: 40, width: "auto", display: "block",
-                                   transform: "translateY(4px)" }}
+                          style={{
+                            height: LOGO_CTA_ALTO,
+                            width: "auto",
+                            display: "block",
+                            transform: `translateY(${LOGO_CTA_BAJADA}px)`,
+                          }}
                         />
                         <span>. Tu campus ya está dentro.</span>
                       </div>

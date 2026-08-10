@@ -328,35 +328,48 @@ img {
 
 .hylo-cta-slot {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 24px;
+  /* -28px a cada lado: es lo que sobresale el marco del hylo
+     (.hylo-item::before va de -28px a -28px). Así la banda llega justo a los
+     bordes visibles, ni corta ni pasada. */
+  left: -28px;
+  right: -28px;
+  /* Pegada abajo del todo y de borde a borde, pero SIN salirse del recuadro. */
+  bottom: 0;
   z-index: 1;
-  display: flex;
-  justify-content: center;
+  display: block;
   pointer-events: none;
-  padding: 0 16px;
 }
 
 .hylo-cta {
-  font-weight: 700;
-  font-size: 15px;
+  font-weight: 600;
+  font-size: 19px;
   letter-spacing: -0.01em;
   color: rgba(255, 255, 255, 0.92);
   text-align: center;
   line-height: 1.3;
+  /* Banda del color de la tarjeta del hylo (#2b2b33) pero un punto más
+     oscura, para que el CTA se lea como parte del mismo sistema. Ocupa todo
+     el ancho y queda dentro del recuadro. */
+  background: #212128;
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  box-sizing: border-box;
 }
 
 /* El logotipo va DENTRO de la frase, ocupando el sitio de la palabra "Hylo".
-   Lleva la cola de la "y" bajando, así que la imagen abarca de la altura de
-   mayúscula hasta el descendente: sin bajarla un poco se queda flotando por
-   encima de la línea de base del texto que la rodea. */
+   MEDIDO sobre el propio PNG: la línea de base de la "h" está al 72,7% de la
+   altura, o sea que el 27,3% de la imagen es cola de la "y". Para que el
+   logotipo se apoye donde se apoya el texto hay que bajarlo ese 27,3% de su
+   alto: con height 1.5em → 0.41em. Si cambias el tamaño, recalcula. */
 .hylo-cta-logo {
-  height: 0.95em;
+  /* Cambia SOLO --alto: la bajada se recalcula sola. */
+  --alto: 1.9em;
+  height: var(--alto);
+  vertical-align: calc(var(--alto) * -0.273);
   width: auto;
   display: inline-block;
-  vertical-align: -0.2em;
-  margin: 0 1px;
+  margin: 0 1px 0 0;
 }
 
 /* =========================================================
@@ -515,14 +528,16 @@ img {
   align-items: center;
   gap: 10px;
   min-width: 0;
-  flex: 1;
+  /* SIN flex:1. Con él se estiraba y empujaba la fecha al extremo derecho,
+     que es como estaba antes. En la app la hora va pegada al nombre. */
+  flex: 0 1 auto;
 }
 
 .hylo-author {
   font-size: 14px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.75);
-  margin: 5px 0 2px 0;
+  margin: 0;
   opacity: 0.95;
   display: flex;
   align-items: center;
@@ -538,7 +553,6 @@ img {
   color: rgba(255, 255, 255, 0.72);
   opacity: 0.9;
   margin: 0;
-  transform: translateX(-6px);
   flex-shrink: 0;
   white-space: nowrap;
   text-align: right;
