@@ -904,3 +904,36 @@ img {
   gap: 108px;
   padding-bottom: 60px;
 }
+
+/* =========================================================
+   YA DESCARGADO
+   La marca es para no repetir hylos al publicarlos en redes. Vive en el
+   navegador de quien descarga (localStorage), no en el servidor.
+========================================================= */
+/* Se apaga la TARJETA y la banda, no el recuadro entero: si no, los botones
+   de debajo se apagan con ellas y no se leen. */
+.hylo-item--hecho .hylo-card,
+.hylo-item--hecho .hylo-cta-slot {
+  opacity: 0.45;
+}
+
+.hylo-descarga--hecho {
+  background: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hylo-descarga--hecho:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.hylo-desmarcar {
+  border: 0;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.45);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: underline;
+  padding: 8px 6px;
+  cursor: pointer;
+}

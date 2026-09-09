@@ -323,8 +323,10 @@ function delaUrl(clave: string, pordefecto: number) {
   return Number.isFinite(v) ? Math.max(-8, Math.min(8, v)) : pordefecto;
 }
 
-const CAIDA_TEXTO = delaUrl("subir", 1.62);
+const CAIDA_TEXTO = delaUrl("subir", 4.2);
 const CAIDA_EXTRA_EMOJI = delaUrl("subirEmoji", 2.8 - 1.62);
+// Sube SOLO el texto de la categoría, además de lo que ya sube con el resto.
+const CAIDA_EXTRA_TEXTO = delaUrl("subirTexto", 0.8);
 
 /**
  * Mete en la copia que va a fotografiar html2canvas: (a) el CSS de la página,
@@ -352,6 +354,10 @@ function aplicarParches(doc: Document) {
       // El marco de líneas finas separa unas tarjetas de otras EN LA PÁGINA;
       // dentro de la imagen sobra.
       ".hylo-item::before,.hylo-item::after{display:none!important}",
+      // Un hylo ya descargado se ve apagado en la página; si se vuelve a
+      // descargar, la imagen tiene que salir a pleno color igual.
+      ".hylo-item--hecho .hylo-card,.hylo-item--hecho .hylo-cta-slot" +
+        "{opacity:1!important}",
       // overflow:hidden es para cortar el nombre con puntos suspensivos; al
       // pintarlo le recorta la cola de la "p".
       ".hylo-author{overflow:visible!important}",
@@ -363,6 +369,10 @@ function aplicarParches(doc: Document) {
       // le da al de abajo: el óvalo mide lo mismo y el contenido sube.
       `.hylo-badge{padding-top:calc(5px - ${CAIDA_TEXTO}px)!important;` +
         `padding-bottom:calc(5px + ${CAIDA_TEXTO}px)!important}`,
+      // Y el texto de la categoría, lo suyo aparte si hace falta.
+      CAIDA_EXTRA_TEXTO
+        ? `.hylo-badge span:not(.hylo-badge-emoji){transform:translateY(${-CAIDA_EXTRA_TEXTO}px)!important}`
+        : "",
       // Ni vertical-align con medida: el logo del CTA se le queda colgado
       // arriba. Con una transformación sí lo baja.
       ".hylo-cta-logo{vertical-align:baseline!important;" +
@@ -376,6 +386,32 @@ function aplicarParches(doc: Document) {
 
   // head puede venir nulo en el documento clonado; documentElement no.
   (doc.head ?? doc.documentElement)?.appendChild(est);
+}
+
+// Los hylos que ya se han descargado, para no repetirlos al publicar.
+//
+// Van en el navegador (localStorage), no en el servidor: la marca es de QUIEN
+// descarga, y así no hace falta ni cuenta ni endpoint. El precio es que no se
+// comparte entre dispositivos.
+const CLAVE_DESCARGADOS = "hylo_feed_descargados_v1";
+
+function leerDescargados(): Set<string> {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(CLAVE_DESCARGADOS) ?? "[]"));
+  } catch {
+    return new Set();
+  }
+}
+
+function guardarDescargado(id: string, si: boolean) {
+  try {
+    const ya = leerDescargados();
+    if (si) ya.add(id);
+    else ya.delete(id);
+    localStorage.setItem(CLAVE_DESCARGADOS, JSON.stringify([...ya]));
+  } catch {
+    // Navegación privada o almacenamiento lleno: no marcamos y ya está.
+  }
 }
 
 type PropsTarjeta = {
@@ -395,6 +431,9 @@ export function TarjetaHylo({
 }: PropsTarjeta) {
   const refMarco = useRef<HTMLDivElement | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  const [descargado, setDescargado] = useState(() =>
+    leerDescargados().has(rowKey),
+  );
 
   const category = safeCategory(r.category);
   const categoryClass = category ?? "uncategorized";
@@ -412,6 +451,11 @@ export function TarjetaHylo({
   // tarjeta copiada de la pantalla, o sea diminuta sobre un lienzo 2,4 veces
   // más ancho. Capturando el marco real, lo que ves es lo que te llevas y no
   // hay dos diseños que mantener.
+  function marcar(si: boolean) {
+    setDescargado(si);
+    guardarDescargado(rowKey, si);
+  }
+
   async function descargar() {
     const marco = refMarco.current;
     if (!marco || ocupado) return;
@@ -462,8 +506,9 @@ export function TarjetaHylo({
       if (navigator.canShare?.({ files: [fichero] })) {
         try {
           await navigator.share({ files: [fichero] });
+          marcar(true);
         } catch {
-          // Canceló la hoja de compartir: no se hace nada más.
+          // Canceló la hoja de compartir: no se marca nada.
         }
         return;
       }
@@ -476,6 +521,7 @@ export function TarjetaHylo({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+      marcar(true);
     } finally {
       setOcupado(false);
     }
@@ -484,7 +530,9 @@ export function TarjetaHylo({
   return (
       <div
         ref={refMarco}
-          className={`hylo-item ${r.image_url ? "hylo-item--image" : ""}`}
+        className={`hylo-item ${r.image_url ? "hylo-item--image" : ""} ${
+          descargado ? "hylo-item--hecho" : ""
+        }`}
       >
         <article
           className={`hylo-card hylo-card--${categoryClass} ${
@@ -503,12 +551,25 @@ export function TarjetaHylo({
         <div className="hylo-bajo">
           <button
             type="button"
-            className="hylo-descarga"
+            className={`hylo-descarga ${descargado ? "hylo-descarga--hecho" : ""}`}
             onClick={() => void descargar()}
             disabled={ocupado}
           >
             {ocupado ? (
               "Preparando..."
+            ) : descargado ? (
+              <>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M20 6 9 17l-5-5"
+                    stroke="currentColor"
+                    strokeWidth="2.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Descargado
+              </>
             ) : (
               <>
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -524,6 +585,17 @@ export function TarjetaHylo({
               </>
             )}
           </button>
+
+          {descargado && (
+            <button
+              type="button"
+              className="hylo-desmarcar"
+              onClick={() => marcar(false)}
+            >
+              Desmarcar
+            </button>
+          )}
+
           {acciones}
         </div>
 
