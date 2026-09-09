@@ -299,7 +299,17 @@ const CAIDA_EXTRA_TEXTO = delaUrl("subirTexto", 0.8);
 
 // Alto máximo de la foto de un hylo. Manda sobre la maquetación entera: con
 // más, la tarjeta se sale del recuadro 4:5 y pisa la banda del CTA.
-const ALTO_MAX_IMAGEN = delaUrl("altoFoto", 165);
+const ALTO_MAX_IMAGEN = delaUrl("altoFoto", 190);
+
+// Cuánto se le recorta al logo del CTA de su transparencia izquierda, en
+// fracción de su alto. 0,101 sería quitársela entera; con eso la "h" quedaba
+// pegada a la "a" de "Descarga".
+if (typeof document !== "undefined") {
+  document.documentElement.style.setProperty(
+    "--recorte-logo",
+    String(delaUrl("hueco", 0.05)),
+  );
+}
 
 /**
  * Mete en la copia que va a fotografiar html2canvas: (a) el CSS de la página,
@@ -390,35 +400,46 @@ function guardarDescargado(id: string, si: boolean) {
 /**
  * La foto de un hylo.
  *
- * La caja se ajusta A LA FOTO (width:auto) y no al revés: con width:100% y un
- * alto máximo, una captura vertical dejaba la caja ancha, la foto dentro con
- * barras a los lados, y el redondeo caía en la CAJA — por eso esas salían con
- * las esquinas cuadradas.
+ * El tamaño se decide al cargar, según la forma de la foto:
+ *   - ancha o normal -> ocupa el ancho de la tarjeta
+ *   - alta (capturas de móvil) -> se limita por el alto y queda más estrecha
  *
- * Pero width:auto ANTES de cargar da una caja de 0x0, así que hasta que carga
- * ocupa el ancho completo y solo después se ciñe a la foto.
+ * En los dos casos la caja ES la foto, así que el redondeo la abraza y no
+ * quedan esquinas cuadradas. Poner solo width:auto no valía: una foto pequeña
+ * se pintaba a su tamaño real y salía diminuta.
  *
- * SIN carga diferida a propósito: con `loading=lazy` las fotos dejaron de
- * salir —una caja de cero no la da el navegador por visible y no la pide
- * nunca— y ni con el ancho restablecido volvieron. Son 62 fotos en todo el
- * feed y esto lo usan dos personas: más vale que carguen siempre.
+ * Sin carga diferida a propósito: con `loading=lazy` las fotos no llegaban a
+ * salir. Son 62 en todo el feed y esto lo usan dos personas.
  */
 function FotoDelHylo({ url, onAbrir }: { url: string; onAbrir: () => void }) {
-  const [cargada, setCargada] = useState(false);
+  const ref = useRef<HTMLImageElement | null>(null);
+  const [medida, setMedida] = useState<{ w: string; h: string } | null>(null);
+
+  function alCargar() {
+    const img = ref.current;
+    const hueco = img?.parentElement?.clientWidth ?? 0;
+    if (!img || !img.naturalWidth || !hueco) return;
+    const altoSiLlenaElAncho = (img.naturalHeight * hueco) / img.naturalWidth;
+    setMedida(
+      altoSiLlenaElAncho <= ALTO_MAX_IMAGEN
+        ? { w: "100%", h: "auto" }
+        : { w: "auto", h: `${ALTO_MAX_IMAGEN}px` },
+    );
+  }
+
   return (
     <img
+      ref={ref}
       src={url}
       alt=""
       decoding="async"
       crossOrigin="anonymous"
-      onLoad={() => setCargada(true)}
+      onLoad={alCargar}
       onClick={onAbrir}
       style={{
-        width: cargada ? "auto" : "100%",
-        height: "auto",
+        width: medida?.w ?? "100%",
+        height: medida?.h ?? "auto",
         maxWidth: "100%",
-        // Bajado de 340: a esa altura la tarjeta se salía del recuadro 4:5 y
-        // se comía la banda del CTA (el logo salía cortado por la h).
         maxHeight: ALTO_MAX_IMAGEN,
         display: "block",
         borderRadius: 20,

@@ -371,10 +371,11 @@ img {
   display: inline-block;
   /* El PNG del logo trae 5,5% de transparencia a la izquierda y 2,75% a la
      derecha (medido sobre el fichero), así que el aire antes de "hylo" salía
-     del doble que el de después. Se recorta el de la izquierda: el hueco que
-     queda es el espacio de la palabra y ya está.
-     0,101 = 5,5% x la proporción del PNG (3307/1800). */
-  margin: 0 1px 0 calc(var(--alto) * -0.101);
+     del doble que el de después. Se le recorta parte del de la izquierda.
+     Quitárselo entero (0,101 = 5,5% x 3307/1800) dejaba la "h" pegada a la
+     "a" de "Descarga"; con la mitad queda a media distancia.
+     Se puede reafinar con ?hueco= en la URL. */
+  margin: 0 1px 0 calc(var(--alto) * -1 * var(--recorte-logo, 0.05));
 }
 
 /* =========================================================
