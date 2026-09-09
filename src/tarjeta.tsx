@@ -335,6 +335,13 @@ export function TarjetaHylo({
 }: PropsTarjeta) {
   const nodoCaptura = useRef<HTMLDivElement | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  // El lienzo de 1080x1350 SOLO existe mientras se descarga.
+  //
+  // Antes vivía montado en las 523 tarjetas del feed, y como html2canvas clona
+  // el documento entero para pintar UN elemento, exportar una tarjeta copiaba
+  // las 523: 9,9 segundos medidos en producción. Montándolo bajo demanda (y
+  // con ignoreElements podando el resto) el clon es diminuto.
+  const [montarLienzo, setMontarLienzo] = useState(false);
 
   const category = safeCategory(r.category);
   const categoryClass = category ?? "uncategorized";
@@ -346,10 +353,19 @@ export function TarjetaHylo({
   // eso, si el navegador sabe compartir ficheros, se usa la hoja de compartir
   // (desde ahí sí se guarda en Fotos). En escritorio, descarga normal.
   async function descargar() {
-    const nodo = nodoCaptura.current;
-    if (!nodo || ocupado) return;
+    if (ocupado) return;
     setOcupado(true);
+    setMontarLienzo(true);
     try {
+      // Un respiro para que React monte el lienzo antes de fotografiarlo.
+      //
+      // Con requestAnimationFrame NO: no se dispara si la pestaña está en
+      // segundo plano, y la descarga se quedaba colgada en "Preparando..."
+      // para siempre. setTimeout corre igual esté visible o no.
+      await new Promise((r) => setTimeout(r, 60));
+      const nodo = nodoCaptura.current;
+      if (!nodo) return;
+
       const lienzo = await html2canvas(nodo, {
         width: 1080,
         height: 1350,
@@ -359,6 +375,9 @@ export function TarjetaHylo({
         useCORS: true,
         backgroundColor: null,
         logging: false,
+        // Poda: todo lo que no sea el lienzo ni un antepasado suyo se salta.
+        // Sin esto, html2canvas clona también las otras 522 tarjetas visibles.
+        ignoreElements: (el) => !(el === nodo || el.contains(nodo) || nodo.contains(el)),
         // El nodo real vive con opacity 0 detrás de todo; html2canvas respeta
         // la opacidad, así que en la COPIA que va a pintar se hace visible.
         onclone: (doc) => {
@@ -399,6 +418,7 @@ export function TarjetaHylo({
       URL.revokeObjectURL(url);
     } finally {
       setOcupado(false);
+      setMontarLienzo(false);
     }
   }
 
@@ -454,6 +474,7 @@ export function TarjetaHylo({
           </span>
         </div>
 
+        {montarLienzo && (
         <div
           ref={(el) => {
             nodoCaptura.current = el;
@@ -566,6 +587,7 @@ export function TarjetaHylo({
 
           </div>
         </div>
+        )}
       </div>
   );
 }
