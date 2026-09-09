@@ -409,12 +409,16 @@ export function TarjetaHylo({
             // Y aun con flex lo deja caído, porque la caja mide 18px y su
             // línea de texto 17: el navegador centra esa diferencia y
             // html2canvas no. Igualar line-height al alto de la caja ayuda
-            // pero no basta: comparando la píldora de la página con la del
-            // PNG a 10 aumentos quedaba 1,2px baja en Actividades y 1,5 en
-            // Crushes. Es constante, no depende del emoji, así que se sube
-            // esa media.
+            // pero no basta.
+            //
+            // MEDIDO con las métricas de la fuente (measureText) contra los
+            // píxeles del PNG, en vez de a ojo: html2canvas baja el emoji
+            // 2,80px y el texto 1,62px respecto a donde los pone el
+            // navegador. Lo que se ve es la diferencia entre los dos, 1,18px,
+            // y ese es el ajuste — el resto se compensa solo porque bajan
+            // los dos a la vez.
             ".hylo-badge-emoji{display:flex!important;line-height:18px!important;" +
-              "transform:translateY(-1.35px)!important}",
+              "transform:translateY(-2.53px)!important}",
             // Ni vertical-align con medida: el logo del CTA se le queda
             // colgado arriba. Se le baja con una transformación, que sí
             // aplica al pintar.
