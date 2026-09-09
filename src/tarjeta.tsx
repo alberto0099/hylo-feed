@@ -105,12 +105,6 @@ function Heart({ filled }: { filled: boolean }) {
   );
 }
 
-// El logotipo va DENTRO de la frase del CTA. MEDIDO sobre el propio PNG: su
-// línea de base está al 72,7% de la altura, así que el 27,3% es cola de la
-// "y". Para que se apoye donde se apoya el texto hay que bajarlo ese 27,3%.
-// Cambia SOLO el alto: la bajada se recalcula.
-const LOGO_CTA_ALTO = 100;
-const LOGO_CTA_BAJADA = Math.round(LOGO_CTA_ALTO * 0.273);
 
 export function renderHyloContent(
   r: PanelPostRow,
@@ -131,12 +125,13 @@ export function renderHyloContent(
         <div
           className={`hylo-badge hylo-badge--${category}`}
           style={{
-            fontSize: capture ? 15 : hasImage ? 14 : 15,
-            padding: capture ? "5px 14px" : hasImage ? "4px 13px" : "5px 14px",
+            fontSize: capture ? 34 : hasImage ? 14 : 15,
+            padding: capture ? "12px 30px" : hasImage ? "4px 13px" : "5px 14px",
             borderRadius: 999,
             fontWeight: 600,
             ...(capture
               ? {
+                  gap: 14,
                   display: "flex",
                   width: "fit-content",
                   alignSelf: "flex-start",
@@ -151,9 +146,9 @@ export function renderHyloContent(
               className="hylo-badge-emoji"
               aria-hidden="true"
               style={{
-                width: capture ? 24 : hasImage ? 20 : 22,
-                height: capture ? 24 : hasImage ? 20 : 22,
-                fontSize: capture ? 20 : hasImage ? 17 : 18,
+                width: capture ? 52 : hasImage ? 20 : 22,
+                height: capture ? 52 : hasImage ? 20 : 22,
+                fontSize: capture ? 44 : hasImage ? 17 : 18,
               }}
             >
               {meta.emoji}
@@ -169,8 +164,8 @@ export function renderHyloContent(
           display: "flex",
           justifyContent: "flex-start",
           alignItems: "center",
-          gap: 4,
-          marginTop: meta ? (hasImage ? 8 : 10) : 0,
+          gap: capture ? 10 : 4,
+          marginTop: meta ? (capture ? 24 : hasImage ? 8 : 10) : 0,
           ...(capture
             ? { width: "fit-content", alignSelf: "flex-start" }
             : null),
@@ -184,7 +179,7 @@ export function renderHyloContent(
           <div
             className="hylo-author"
             style={{
-              fontSize: capture ? 16 : hasImage ? 14 : 16,
+              fontSize: capture ? 36 : hasImage ? 14 : 16,
               fontWeight: 600,
             }}
           >
@@ -195,8 +190,8 @@ export function renderHyloContent(
         <span
           aria-hidden="true"
           style={{
-            width: 2,
-            height: 2,
+            width: capture ? 5 : 2,
+            height: capture ? 5 : 2,
             borderRadius: 999,
             background: "rgba(255,255,255,0.5)",
             margin: "0 1px",
@@ -208,7 +203,7 @@ export function renderHyloContent(
         <div
           className="hylo-time"
           style={{
-            fontSize: capture ? 16 : hasImage ? 14 : 16,
+            fontSize: capture ? 36 : hasImage ? 14 : 16,
             fontWeight: 400,
             color: "rgba(255,255,255,0.5)",
             opacity: 1,
@@ -223,9 +218,9 @@ export function renderHyloContent(
       <p
         className="hylo-body"
         style={{
-          fontSize: capture ? 16 : hasImage ? 14 : 16,
+          fontSize: capture ? 38 : hasImage ? 14 : 16,
           lineHeight: hasImage ? 1.28 : 1.32,
-          marginTop: hasImage ? 4 : 5,
+          marginTop: capture ? 14 : hasImage ? 4 : 5,
           marginBottom: hasImage ? 6 : 0,
           fontWeight: 500,
         }}
@@ -333,15 +328,8 @@ export function TarjetaHylo({
   onAbrirImagen,
   acciones,
 }: PropsTarjeta) {
-  const nodoCaptura = useRef<HTMLDivElement | null>(null);
+  const refMarco = useRef<HTMLDivElement | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  // El lienzo de 1080x1350 SOLO existe mientras se descarga.
-  //
-  // Antes vivía montado en las 523 tarjetas del feed, y como html2canvas clona
-  // el documento entero para pintar UN elemento, exportar una tarjeta copiaba
-  // las 523: 9,9 segundos medidos en producción. Montándolo bajo demanda (y
-  // con ignoreElements podando el resto) el clon es diminuto.
-  const [montarLienzo, setMontarLienzo] = useState(false);
 
   const category = safeCategory(r.category);
   const categoryClass = category ?? "uncategorized";
@@ -352,42 +340,52 @@ export function TarjetaHylo({
   // En el iPhone `<a download>` no guarda nada: Safari abre la imagen y ya. Por
   // eso, si el navegador sabe compartir ficheros, se usa la hoja de compartir
   // (desde ahí sí se guarda en Fotos). En escritorio, descarga normal.
+  // Fotografía EL RECUADRO QUE SE VE, escalado a 1080x1350.
+  //
+  // Antes había una plantilla oscura aparte de 1080x1350, y la imagen no se
+  // parecía a la página: fondo negro en vez del rosa, y la tipografía de la
+  // tarjeta copiada de la pantalla, o sea diminuta sobre un lienzo 2,4 veces
+  // más ancho. Capturando el marco real, lo que ves es lo que te llevas y no
+  // hay dos diseños que mantener.
   async function descargar() {
-    if (ocupado) return;
+    const marco = refMarco.current;
+    if (!marco || ocupado) return;
     setOcupado(true);
-    setMontarLienzo(true);
     try {
-      // Un respiro para que React monte el lienzo antes de fotografiarlo.
-      //
-      // Con requestAnimationFrame NO: no se dispara si la pestaña está en
-      // segundo plano, y la descarga se quedaba colgada en "Preparando..."
-      // para siempre. setTimeout corre igual esté visible o no.
-      await new Promise((r) => setTimeout(r, 60));
-      const nodo = nodoCaptura.current;
-      if (!nodo) return;
+      const caja = marco.getBoundingClientRect();
+      const ancho = caja.width;
+      const alto = ancho * 1.25; // 4:5, el del post de Instagram
 
-      const lienzo = await html2canvas(nodo, {
-        width: 1080,
-        height: 1350,
-        windowWidth: 1080,
-        windowHeight: 1350,
-        scale: 1,
+      const lienzo = await html2canvas(marco, {
+        width: ancho,
+        height: alto,
+        scale: 1080 / ancho,
+        backgroundColor: "#db92c9",
         useCORS: true,
-        backgroundColor: null,
         logging: false,
-        // Poda: todo lo que no sea el lienzo ni un antepasado suyo se salta.
-        // Sin esto, html2canvas clona también las otras 522 tarjetas visibles.
-        ignoreElements: (el) => !(el === nodo || el.contains(nodo) || nodo.contains(el)),
-        // El nodo real vive con opacity 0 detrás de todo; html2canvas respeta
-        // la opacidad, así que en la COPIA que va a pintar se hace visible.
+        // Poda doble: fuera los controles de debajo (no son parte de la
+        // imagen) y fuera las otras 522 tarjetas, que si no html2canvas las
+        // clona todas para pintar una sola.
+        //
+        // La poda se limita a lo que cuelga de <body>: si se aplicara al
+        // documento entero se llevaría por delante los <style> del <head> y
+        // la copia salía SIN CSS — fondo blanco y texto suelto.
+        ignoreElements: (el) =>
+          el.classList?.contains("hylo-bajo") ||
+          (document.body.contains(el) &&
+            !(el === marco || el.contains(marco) || marco.contains(el))),
         onclone: (doc) => {
-          const copia = doc.querySelector(
-            `[data-captura="${rowKey}"]`,
-          ) as HTMLElement | null;
-          if (copia) {
-            copia.style.opacity = "1";
-            copia.style.zIndex = "0";
-          }
+          const est = doc.createElement("style");
+          est.textContent =
+            // El marco de líneas finas separa unas tarjetas de otras EN LA
+            // PÁGINA; dentro de la imagen sobra.
+            ".hylo-item::before,.hylo-item::after{display:none!important}" +
+            // El nombre lleva overflow:hidden para el corte con puntos
+            // suspensivos, y al pintarlo html2canvas le recorta la cola de
+            // la "p" de "Anónimo".
+            ".hylo-author{overflow:visible!important}";
+          // head puede venir nulo en el documento clonado; documentElement no.
+          (doc.head ?? doc.documentElement)?.appendChild(est);
         },
       });
 
@@ -418,12 +416,12 @@ export function TarjetaHylo({
       URL.revokeObjectURL(url);
     } finally {
       setOcupado(false);
-      setMontarLienzo(false);
     }
   }
 
   return (
       <div
+        ref={refMarco}
           className={`hylo-item ${r.image_url ? "hylo-item--image" : ""}`}
       >
         <article
@@ -474,120 +472,6 @@ export function TarjetaHylo({
           </span>
         </div>
 
-        {montarLienzo && (
-        <div
-          ref={(el) => {
-            nodoCaptura.current = el;
-          }}
-          data-captura={rowKey}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: 1080,
-            height: 1350,
-            overflow: "hidden",
-            background:
-              "radial-gradient(circle at top center, rgba(255, 120, 210, 0.10) 0%, transparent 26%), radial-gradient(circle at bottom center, rgba(190, 110, 255, 0.10) 0%, transparent 30%), linear-gradient(180deg, #04040a 0%, #090913 42%, #05050a 100%)",
-            color: "white",
-            fontFamily: "Raleway, system-ui, sans-serif",
-            padding: 72,
-            boxSizing: "border-box",
-            opacity: 0,
-            pointerEvents: "none",
-            zIndex: -1,
-          }}
-        >
-          <div
-            style={{
-              position: "relative",
-              zIndex: 2,
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 34,
-              }}
-            >
-              <article
-                style={{
-                  position: "relative",
-                  borderRadius: 56,
-                  padding: 46,
-                  background:
-                    "linear-gradient(180deg, rgba(34,34,40,0.96) 0%, rgba(18,18,22,0.985) 100%)",
-                  boxShadow: "0 10px 24px rgba(0,0,0,0.20)",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    borderRadius: 56,
-                    pointerEvents: "none",
-                    background:
-                      "radial-gradient(circle at top left, rgba(244,178,230,0.18) 0%, rgba(244,178,230,0.07) 26%, transparent 56%)",
-                  }}
-                />
-
-                <div
-                  style={{
-                    position: "relative",
-                    zIndex: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  {renderHyloContent(r, category, authorName, {
-                    capture: true,
-                  })}
-                </div>
-              </article>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "baseline",
-                justifyContent: "center",
-                gap: 9,
-                fontFamily: "Raleway, system-ui, sans-serif",
-                fontWeight: 600,
-                fontSize: 52,
-                letterSpacing: "-0.01em",
-                color: "rgba(255,255,255,0.92)",
-                whiteSpace: "nowrap",
-                background: "#212128",
-                // Sangra los 72px de padding del lienzo para llegar a
-                // los bordes de la imagen, sin pasarse de ellos.
-                margin: "0 -72px -72px",
-                padding: "34px 44px",
-              }}
-            >
-              <span>Descarga</span>
-              <img
-                src="/hylo_logo.png"
-                alt="Hylo"
-                style={{
-                  height: LOGO_CTA_ALTO,
-                  width: "auto",
-                  display: "block",
-                  transform: `translateY(${LOGO_CTA_BAJADA}px)`,
-                }}
-              />
-              <span>. Tu campus ya está dentro.</span>
-            </div>
-
-          </div>
-        </div>
-        )}
       </div>
   );
 }
