@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/cotilleo", "destination": "/index.html" }]
+}

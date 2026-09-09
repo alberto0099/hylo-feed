@@ -183,7 +183,7 @@ img {
 .hylo-wrap {
   width: 100%;
   min-height: 100vh;
-  max-width: 520px;
+  max-width: 548px;
   margin: 0 auto;
   padding: 8px 0 18px;
   position: relative;
@@ -194,8 +194,8 @@ img {
   position: relative;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0;
-  padding: 0 14px;
+  gap: 76px;
+  padding: 0;
   overflow: visible;
 }
 
@@ -220,17 +220,20 @@ img {
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  min-height: 640px;
-  padding-top: 56px;
-  padding-bottom: 56px;
+  aspect-ratio: 4 / 5;
+  padding: 8% 6.7%;
   box-sizing: border-box;
+  /* Sin esto, la rejilla le da al recuadro un ancho mínimo automático
+     derivado de la altura del contenido (alto x 0.8) y una sola tarjeta larga
+     ensancha la columna entera: 624px en una pantalla de 375. */
+  min-width: 0;
 }
 
 .hylo-item::before {
   content: "";
   position: absolute;
-  left: -28px;
-  right: -28px;
+  left: 0;
+  right: 0;
   top: 0;
   bottom: 0;
   pointer-events: none;
@@ -243,8 +246,8 @@ img {
 .hylo-item::after {
   content: "";
   position: absolute;
-  left: -28px;
-  right: -28px;
+  left: 0;
+  right: 0;
   bottom: 0;
   height: 1px;
   background: rgba(0, 0, 0, 0.32);
@@ -328,11 +331,8 @@ img {
 
 .hylo-cta-slot {
   position: absolute;
-  /* -28px a cada lado: es lo que sobresale el marco del hylo
-     (.hylo-item::before va de -28px a -28px). Así la banda llega justo a los
-     bordes visibles, ni corta ni pasada. */
-  left: -28px;
-  right: -28px;
+  left: 0;
+  right: 0;
   /* Pegada abajo del todo y de borde a borde, pero SIN salirse del recuadro. */
   bottom: 0;
   z-index: 1;
@@ -446,7 +446,7 @@ img {
   background: rgba(244, 178, 230, 0.20);
   border: 0;
   box-shadow: none;
-  color: #f0a8df;
+  color: #db92c9;
 }
 
 .hylo-badge--apuntes {
@@ -634,8 +634,8 @@ img {
   }
 
   .hylo-grid {
-    gap: 0;
-    padding: 0 12px;
+    gap: 64px;
+    padding: 0;
   }
 
   .hylo-card {
@@ -647,8 +647,11 @@ img {
     max-height: 260px;
   }
 
+  .hylo-item:first-child {
+    margin-top: 90px;
+  }
+
   .hylo-item {
-    min-height: 600px;
     margin-bottom: 0;
   }
 
@@ -695,4 +698,150 @@ img {
 .hylo-item--image img {
   max-height: 200px;
   border-radius: 20px;
+}
+
+/* =========================================================
+   BOTÓN DE DESCARGA
+   Vive FUERA del recuadro (top: 100%), en el hueco que deja el gap de la
+   rejilla, para que no salga en la imagen exportada.
+========================================================= */
+.hylo-descarga {
+  position: absolute;
+  top: calc(100% + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: #212128;
+  color: rgba(255, 255, 255, 0.94);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.hylo-descarga:hover {
+  background: #2b2b33;
+}
+
+.hylo-descarga:active {
+  transform: translateX(-50%) scale(0.96);
+}
+
+.hylo-descarga:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.hylo-descarga svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+/* =========================================================
+   PANTALLA DE COTILLEO (la de Fabio)
+========================================================= */
+.cotilleo-barra {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(14px, env(safe-area-inset-top)) 18px 14px;
+  background: #1a1a20;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cotilleo-titulo {
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.cotilleo-limpiar {
+  border: 0;
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.88);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.cotilleo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px 20px;
+  background: #1a1a20;
+}
+
+.cotilleo-texto,
+.cotilleo-select,
+.cotilleo-nombre {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  background: #24242c;
+  color: rgba(255, 255, 255, 0.96);
+  font-family: inherit;
+  /* 16px o menos hace que Safari haga zoom al enfocar el campo. */
+  font-size: 16px;
+  padding: 12px 14px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.cotilleo-texto {
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.cotilleo-texto:focus,
+.cotilleo-select:focus,
+.cotilleo-nombre:focus {
+  border-color: rgba(244, 178, 230, 0.55);
+}
+
+.cotilleo-campos {
+  display: flex;
+  gap: 10px;
+}
+
+.cotilleo-campos > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.cotilleo-vacio {
+  margin: 0;
+  padding: 46px 24px;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* La vista previa no lleva los 200px de aire del primer hylo del feed. */
+.cotilleo-vista .hylo-item:first-child {
+  margin-top: 26px;
+}
+
+.cotilleo-vista .hylo-grid {
+  padding-bottom: 40px;
 }

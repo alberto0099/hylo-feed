@@ -1,0 +1,13 @@
+{
+  "name": "Cotilleo",
+  "short_name": "Cotilleo",
+  "start_url": "/cotilleo",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1a1a20",
+  "theme_color": "#1a1a20",
+  "icons": [
+    { "src": "/icono-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
