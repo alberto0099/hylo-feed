@@ -65,6 +65,32 @@ export function formatFeedDate(iso: string) {
   });
 }
 
+// Bocadillo y avión, escritos como SVG en vez de <img src="*.svg">.
+//
+// html2canvas NO pinta las imágenes SVG: en el PNG descargado salía el
+// corazón (que ya era SVG en línea) y faltaban estos dos. Mismo trazo que el
+// corazón, para que los tres se vean iguales.
+function Bocadillo() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
+      strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"
+      aria-hidden="true" style={{ display: "block" }}>
+      <path d="M21 11.6c0 4.2-4.03 7.6-9 7.6a10 10 0 0 1-2.9-.42L4 20.5l1.4-3.6A7.1 7.1 0 0 1 3 11.6C3 7.4 7.03 4 12 4s9 3.4 9 7.6z" />
+    </svg>
+  );
+}
+
+function Avion() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
+      strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"
+      aria-hidden="true" style={{ display: "block" }}>
+      <path d="M21.4 3.1 2.9 9.55c-.72.25-.7 1.28.03 1.5l6.5 1.96 1.96 6.5c.22.73 1.25.75 1.5.03L19.3 3.1a.75.75 0 0 0-.95-.95z" />
+      <path d="M21.4 3.1 9.43 13.01" />
+    </svg>
+  );
+}
+
 function Heart({ filled }: { filled: boolean }) {
   return (
     <span
@@ -286,25 +312,11 @@ export function renderHyloContent(
           </button>
 
           <button className="hylo-action hylo-comments" type="button" aria-label="Comentarios">
-            <img
-              src="/commentbox.svg"
-              alt=""
-              aria-hidden="true"
-              width={18}
-              height={18}
-              style={{ display: "block" }}
-            />
+            <Bocadillo />
           </button>
 
           <button className="hylo-action hylo-action--send" type="button" aria-label="Enviar mensaje">
-            <img
-              src="/send.svg"
-              alt=""
-              aria-hidden="true"
-              width={18}
-              height={18}
-              style={{ display: "block" }}
-            />
+            <Avion />
           </button>
         </div>
       ) : null}

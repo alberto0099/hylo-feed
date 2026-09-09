@@ -218,10 +218,10 @@ img {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 8px;
+  justify-content: flex-start;
+  gap: 0;
   aspect-ratio: 4 / 5;
-  padding: 8% 6.7%;
+  padding: 0;
   box-sizing: border-box;
   /* Sin esto, la rejilla le da al recuadro un ancho mínimo automático
      derivado de la altura del contenido (alto x 0.8) y una sola tarjeta larga
@@ -264,6 +264,7 @@ img {
 .hylo-card {
   position: relative;
   z-index: 0;
+  margin: auto 6.7%;
   border-radius: 32px;
   padding: 22px 18px 18px;
   overflow: hidden;
@@ -330,11 +331,10 @@ img {
 }
 
 .hylo-cta-slot {
-  position: absolute;
-  left: 0;
-  right: 0;
-  /* Pegada abajo del todo y de borde a borde, pero SIN salirse del recuadro. */
-  bottom: 0;
+  /* En el flujo, como último hijo: así ocupa el ancho entero del recuadro y,
+     sobre todo, la tarjeta se centra en el hueco que deja y no en el alto
+     completo (antes quedaba baja, casi encima de la banda). */
+  position: static;
   z-index: 1;
   display: block;
   pointer-events: none;
@@ -669,8 +669,7 @@ img {
    IMAGE POSTS COMPACT
 ========================================================= */
 .hylo-item--image {
-  padding-top: 56px;
-  padding-bottom: 56px;
+  padding: 0;
 }
 
 .hylo-item--image .hylo-card {
