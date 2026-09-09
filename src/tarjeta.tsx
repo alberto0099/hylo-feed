@@ -245,30 +245,10 @@ export function renderHyloContent(
             justifyContent: "flex-start",
           }}
         >
-          {/* La caja se ajusta A LA FOTO, no al revés.
-              Antes iba con width:100% y maxHeight fijo: en una captura
-              vertical el navegador dejaba la caja ancha, metía la foto dentro
-              con barras a los lados, y el redondeo caía en la CAJA — de ahí
-              que esas salieran con las esquinas cuadradas. Con width:auto la
-              caja ES la foto y el redondeo la abraza siempre. */}
-          <img
-            src={r.image_url}
-            alt=""
-            loading="lazy"
-            crossOrigin="anonymous"
-            onClick={() => {
+          <FotoDelHylo
+            url={r.image_url}
+            onAbrir={() => {
               if (r.image_url) opts?.onAbrirImagen?.(r.image_url);
-            }}
-            style={{
-              width: "auto",
-              height: "auto",
-              maxWidth: "100%",
-              // Bajado de 340: a esa altura la tarjeta se salía del recuadro
-              // 4:5 y se comía la banda del CTA (el logo salía cortado).
-              maxHeight: ALTO_MAX_IMAGEN,
-              display: "block",
-              borderRadius: 20,
-              cursor: "zoom-in",
             }}
           />
         </div>
@@ -405,6 +385,43 @@ function guardarDescargado(id: string, si: boolean) {
   } catch {
     // Navegación privada o almacenamiento lleno: no marcamos y ya está.
   }
+}
+
+/**
+ * La foto de un hylo.
+ *
+ * La caja se ajusta A LA FOTO (width:auto) y no al revés: con width:100% y un
+ * alto máximo, una captura vertical dejaba la caja ancha, la foto dentro con
+ * barras a los lados, y el redondeo caía en la CAJA — por eso esas salían con
+ * las esquinas cuadradas.
+ *
+ * Pero width:auto ANTES de cargar da una caja de 0x0, y entonces `loading=lazy`
+ * no la considera nunca visible y la foto no se carga jamás. Así que hasta que
+ * carga ocupa el ancho completo, y solo después se ciñe a la foto.
+ */
+function FotoDelHylo({ url, onAbrir }: { url: string; onAbrir: () => void }) {
+  const [cargada, setCargada] = useState(false);
+  return (
+    <img
+      src={url}
+      alt=""
+      loading="lazy"
+      crossOrigin="anonymous"
+      onLoad={() => setCargada(true)}
+      onClick={onAbrir}
+      style={{
+        width: cargada ? "auto" : "100%",
+        height: "auto",
+        maxWidth: "100%",
+        // Bajado de 340: a esa altura la tarjeta se salía del recuadro 4:5 y
+        // se comía la banda del CTA (el logo salía cortado por la h).
+        maxHeight: ALTO_MAX_IMAGEN,
+        display: "block",
+        borderRadius: 20,
+        cursor: "zoom-in",
+      }}
+    />
+  );
 }
 
 type PropsTarjeta = {
