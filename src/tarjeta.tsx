@@ -368,14 +368,24 @@ export function TarjetaHylo({
             !(el === marco || el.contains(marco) || marco.contains(el))),
         onclone: (doc) => {
           const est = doc.createElement("style");
-          est.textContent =
+          // Parches SOLO para la foto. La página se queda como está: aquí
+          // se corrigen las cosas que html2canvas no sabe interpretar.
+          est.textContent = [
             // El marco de líneas finas separa unas tarjetas de otras EN LA
             // PÁGINA; dentro de la imagen sobra.
-            ".hylo-item::before,.hylo-item::after{display:none!important}" +
-            // El nombre lleva overflow:hidden para el corte con puntos
-            // suspensivos, y al pintarlo html2canvas le recorta la cola de
-            // la "p" de "Anónimo".
-            ".hylo-author{overflow:visible!important}";
+            ".hylo-item::before,.hylo-item::after{display:none!important}",
+            // overflow:hidden es para cortar el nombre con puntos
+            // suspensivos; al pintarlo le recorta la cola de la "p".
+            ".hylo-author{overflow:visible!important}",
+            // No entiende inline-flex: el emoji de la etiqueta se le cae por
+            // debajo del texto. Dentro de un flex, `flex` se ve igual.
+            ".hylo-badge-emoji{display:flex!important}",
+            // Ni vertical-align con medida: el logo del CTA se le queda
+            // colgado arriba. Se le baja con una transformación, que sí
+            // aplica al pintar.
+            ".hylo-cta-logo{vertical-align:baseline!important;" +
+              "transform:translateY(calc(var(--alto) * 0.273))!important}",
+          ].join("");
           // head puede venir nulo en el documento clonado; documentElement no.
           (doc.head ?? doc.documentElement)?.appendChild(est);
         },

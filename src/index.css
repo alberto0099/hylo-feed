@@ -366,11 +366,7 @@ img {
   /* Cambia SOLO --alto: la bajada se recalcula sola. */
   --alto: 1.9em;
   height: var(--alto);
-  /* Baja el logo hasta apoyarlo donde se apoya el texto. Antes iba con
-     vertical-align, que html2canvas ignora: en el PNG "hylo" salía en la
-     línea de base y descolocado. Con top relativo sí lo respeta. */
-  position: relative;
-  top: calc(var(--alto) * 0.273);
+  vertical-align: calc(var(--alto) * -0.273);
   width: auto;
   display: inline-block;
   margin: 0 1px 0 0;
@@ -438,9 +434,7 @@ img {
 .hylo-badge-emoji {
   width: 18px;
   height: 18px;
-  /* flex y no inline-flex: html2canvas no entiende inline-flex y en el PNG
-     el emoji salía desalineado. Dentro de un flex se ve igual. */
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
