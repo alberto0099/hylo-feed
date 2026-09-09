@@ -406,12 +406,15 @@ export function TarjetaHylo({
             // No entiende inline-flex: el emoji de la etiqueta se le cae por
             // debajo del texto. Dentro de un flex, `flex` se ve igual.
             //
-            // SIN corrección vertical a mano: probé a subirlo y lo que hay es
-            // que cada emoji tiene su propio reparto de tinta dentro de la
-            // caja. Medido: el calendario cae 3,5px (de 1080) y la carita
-            // 0,6px. Un empujón fijo arregla uno y estropea el otro, y la
-            // caja ya está centrada.
-            ".hylo-badge-emoji{display:flex!important}",
+            // Y aun con flex lo deja caído, porque la caja mide 18px y su
+            // línea de texto 17: el navegador centra esa diferencia y
+            // html2canvas no. Igualar line-height al alto de la caja ayuda
+            // pero no basta: comparando la píldora de la página con la del
+            // PNG a 10 aumentos quedaba 1,2px baja en Actividades y 1,5 en
+            // Crushes. Es constante, no depende del emoji, así que se sube
+            // esa media.
+            ".hylo-badge-emoji{display:flex!important;line-height:18px!important;" +
+              "transform:translateY(-1.35px)!important}",
             // Ni vertical-align con medida: el logo del CTA se le queda
             // colgado arriba. Se le baja con una transformación, que sí
             // aplica al pintar.
