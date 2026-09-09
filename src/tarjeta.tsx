@@ -405,12 +405,25 @@ export function TarjetaHylo({
             ".hylo-author{overflow:visible!important}",
             // No entiende inline-flex: el emoji de la etiqueta se le cae por
             // debajo del texto. Dentro de un flex, `flex` se ve igual.
+            //
+            // SIN corrección vertical a mano: probé a subirlo y lo que hay es
+            // que cada emoji tiene su propio reparto de tinta dentro de la
+            // caja. Medido: el calendario cae 3,5px (de 1080) y la carita
+            // 0,6px. Un empujón fijo arregla uno y estropea el otro, y la
+            // caja ya está centrada.
             ".hylo-badge-emoji{display:flex!important}",
             // Ni vertical-align con medida: el logo del CTA se le queda
             // colgado arriba. Se le baja con una transformación, que sí
             // aplica al pintar.
             ".hylo-cta-logo{vertical-align:baseline!important;" +
               "transform:translateY(calc(var(--alto) * 0.273))!important}",
+            // Y como con vertical-align:baseline el logo reserva su alto por
+            // ENCIMA de la línea, la caja crece hacia arriba y el bloque
+            // entero baja: medidos 100px de aire arriba contra 38 abajo.
+            // Se compensa quitando arriba lo mismo que se añade abajo
+            // (0.273 x 1.9em = el desplazamiento del logo).
+            ".hylo-cta{padding-top:calc(14px - 0.594em)!important;" +
+              "padding-bottom:calc(14px + 0.594em)!important}",
           ].join("");
           // head puede venir nulo en el documento clonado; documentElement no.
           (doc.head ?? doc.documentElement)?.appendChild(est);
