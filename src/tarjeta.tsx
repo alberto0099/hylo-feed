@@ -305,6 +305,129 @@ export function renderHyloContent(
 }
 
 
+// Cuánto hay que subir el emoji de la etiqueta en la FOTO. Se mide una vez por
+// sesión (ver medirDesfaseEmoji) porque depende del motor del navegador:
+// Safari y Chrome colocan el texto distinto y un número fijo sale torcido en
+// uno de los dos. null = todavía sin medir.
+let ajusteEmojiMedido: number | null = null;
+
+/**
+ * Mete en la copia que va a fotografiar html2canvas: (a) el CSS de la página,
+ * y (b) los parches de las cosas que no sabe interpretar.
+ *
+ * El CSS se copia a mano porque html2canvas monta la copia en un iframe y allí
+ * la hoja de estilos se vuelve a pedir por su cuenta; si no llegaba a tiempo
+ * salía un PNG sin estilos, con serifas y sin tarjeta.
+ */
+function aplicarParches(doc: Document, ajusteEmoji: number) {
+  let css = "";
+  for (const hoja of Array.from(document.styleSheets)) {
+    try {
+      for (const regla of Array.from(hoja.cssRules)) css += regla.cssText + "\n";
+    } catch {
+      // Hoja de otro origen (las tipografías de Google): ni se puede leer ni
+      // hace falta para la maquetación.
+    }
+  }
+
+  const est = doc.createElement("style");
+  est.textContent =
+    css +
+    [
+      // El marco de líneas finas separa unas tarjetas de otras EN LA PÁGINA;
+      // dentro de la imagen sobra.
+      ".hylo-item::before,.hylo-item::after{display:none!important}",
+      // overflow:hidden es para cortar el nombre con puntos suspensivos; al
+      // pintarlo le recorta la cola de la "p".
+      ".hylo-author{overflow:visible!important}",
+      // No entiende inline-flex y el emoji se le cae por debajo del texto.
+      // Dentro de un flex, `flex` se ve igual. El empujón que queda va medido.
+      ".hylo-badge-emoji{display:flex!important;line-height:18px!important" +
+        (ajusteEmoji ? `;transform:translateY(${ajusteEmoji}px)!important` : "") +
+        "}",
+      // Ni vertical-align con medida: el logo del CTA se le queda colgado
+      // arriba. Con una transformación sí lo baja.
+      ".hylo-cta-logo{vertical-align:baseline!important;" +
+        "transform:translateY(calc(var(--alto) * 0.273))!important}",
+      // Y como así el logo reserva su alto POR ENCIMA de la línea, la caja
+      // crece hacia arriba y el bloque baja. Se compensa quitando arriba lo
+      // mismo que se añade abajo.
+      ".hylo-cta{padding-top:calc(14px - 0.594em)!important;" +
+        "padding-bottom:calc(14px + 0.594em)!important}",
+    ].join("");
+
+  // head puede venir nulo en el documento clonado; documentElement no.
+  (doc.head ?? doc.documentElement)?.appendChild(est);
+}
+
+/**
+ * Mide, sobre la foto YA HECHA, cuánto ha quedado el emoji por debajo del
+ * texto de la etiqueta. Devuelve píxeles CSS (positivo = el emoji está bajo).
+ *
+ * Se mide aquí y no sobre la píldora suelta porque html2canvas coloca el texto
+ * de forma distinta según el tamaño y el contexto en que lo pinta: calibrar
+ * con la píldora aislada daba 1,6px y la foto real tenía 2,5px.
+ */
+function medirDesfaseEmoji(
+  lienzo: HTMLCanvasElement,
+  marco: HTMLElement,
+  esc: number,
+): number | null {
+  const emo = marco.querySelector<HTMLElement>(".hylo-badge-emoji");
+  const lab = marco.querySelector<HTMLElement>(
+    ".hylo-badge span:not(.hylo-badge-emoji)",
+  );
+  if (!emo || !lab) return null;
+
+  const ctx = lienzo.getContext("2d");
+  if (!ctx) return null;
+  const W = lienzo.width;
+  const datos = ctx.getImageData(0, 0, W, lienzo.height).data;
+  const en = (x: number, y: number) => {
+    const i = (y * W + x) * 4;
+    return [datos[i], datos[i + 1], datos[i + 2]];
+  };
+
+  const base = marco.getBoundingClientRect();
+  const centro = (el: HTMLElement, dxFondo: number) => {
+    const r = el.getBoundingClientRect();
+    const x0 = Math.round((r.left - base.left) * esc);
+    const y0 = Math.round((r.top - base.top) * esc);
+    const an = Math.round(r.width * esc);
+    const al = Math.round(r.height * esc);
+    // El color de la píldora, tomado a un lado del glifo.
+    const fondo = en(x0 + dxFondo, y0 + Math.round(al / 2));
+    const hayTinta = (x: number, y: number) => {
+      const p = en(x, y);
+      return (
+        Math.abs(p[0] - fondo[0]) +
+          Math.abs(p[1] - fondo[1]) +
+          Math.abs(p[2] - fondo[2]) >
+        45
+      );
+    };
+    const margen = Math.round(3 * esc);
+    let arr: number | null = null;
+    let aba = 0;
+    for (let y = y0 - margen; y < y0 + al + margen; y++) {
+      for (let x = x0 + 1; x < x0 + an - 1; x++) {
+        if (hayTinta(x, y)) {
+          if (arr === null) arr = y;
+          aba = y;
+          break;
+        }
+      }
+    }
+    return arr === null ? null : (arr + aba) / 2;
+  };
+
+  const cE = centro(emo, -Math.round(5 * esc));
+  const cL = centro(lab, Math.round(lab.getBoundingClientRect().width * esc) + 12);
+  if (cE === null || cL === null) return null;
+  return (cE - cL) / esc;
+}
+
+
 type PropsTarjeta = {
   r: PanelPostRow;
   /** Clave única; da nombre al PNG y marca el lienzo oculto. */
@@ -354,88 +477,42 @@ export function TarjetaHylo({
       const caja = marco.getBoundingClientRect();
       const ancho = caja.width;
       const alto = ancho * 1.25; // 4:5, el del post de Instagram
+      const esc = 1080 / ancho;
 
-      const lienzo = await html2canvas(marco, {
-        width: ancho,
-        height: alto,
-        scale: 1080 / ancho,
-        backgroundColor: "#db92c9",
-        useCORS: true,
-        logging: false,
-        // Poda doble: fuera los controles de debajo (no son parte de la
-        // imagen) y fuera las otras 522 tarjetas, que si no html2canvas las
-        // clona todas para pintar una sola.
-        //
-        // La poda se limita a lo que cuelga de <body>: si se aplicara al
-        // documento entero se llevaría por delante los <style> del <head> y
-        // la copia salía SIN CSS — fondo blanco y texto suelto.
-        ignoreElements: (el) =>
-          el.classList?.contains("hylo-bajo") ||
-          (document.body.contains(el) &&
-            !(el === marco || el.contains(marco) || marco.contains(el))),
-        onclone: (doc) => {
-          const est = doc.createElement("style");
-          // El CSS de la página, COPIADO a mano dentro de la copia.
+      const hacerFoto = (ajusteEmoji: number) =>
+        html2canvas(marco, {
+          width: ancho,
+          height: alto,
+          scale: esc,
+          backgroundColor: "#db92c9",
+          useCORS: true,
+          logging: false,
+          // Poda doble: fuera los controles de debajo (no son parte de la
+          // imagen) y fuera las otras 522 tarjetas, que si no html2canvas las
+          // clona todas para pintar una sola.
           //
-          // html2canvas monta la copia en un iframe aparte, y allí la hoja de
-          // estilos se vuelve a pedir por su cuenta: si no ha llegado cuando
-          // pinta, sale un PNG sin estilos —texto negro con serifas y sin
-          // tarjeta—. Pasaba de vez en cuando, y más en el móvil. Metiendo
-          // las reglas aquí ya no depende de esa carrera.
-          let css = "";
-          for (const hoja of Array.from(document.styleSheets)) {
-            try {
-              for (const regla of Array.from(hoja.cssRules)) {
-                css += regla.cssText + "\n";
-              }
-            } catch {
-              // Hoja de otro origen (las tipografías de Google): no se puede
-              // leer, y tampoco hace falta para la maquetación.
-            }
-          }
+          // La poda se limita a lo que cuelga de <body>: si se aplicara al
+          // documento entero se llevaría por delante los <style> del <head> y
+          // la copia salía SIN CSS — fondo blanco y texto suelto.
+          ignoreElements: (el) =>
+            el.classList?.contains("hylo-bajo") ||
+            (document.body.contains(el) &&
+              !(el === marco || el.contains(marco) || marco.contains(el))),
+          onclone: (doc) => aplicarParches(doc, ajusteEmoji),
+        });
 
-          // Parches SOLO para la foto. La página se queda como está: aquí
-          // se corrigen las cosas que html2canvas no sabe interpretar.
-          est.textContent = css + [
-            // El marco de líneas finas separa unas tarjetas de otras EN LA
-            // PÁGINA; dentro de la imagen sobra.
-            ".hylo-item::before,.hylo-item::after{display:none!important}",
-            // overflow:hidden es para cortar el nombre con puntos
-            // suspensivos; al pintarlo le recorta la cola de la "p".
-            ".hylo-author{overflow:visible!important}",
-            // No entiende inline-flex: el emoji de la etiqueta se le cae por
-            // debajo del texto. Dentro de un flex, `flex` se ve igual.
-            //
-            // Y aun con flex lo deja caído, porque la caja mide 18px y su
-            // línea de texto 17: el navegador centra esa diferencia y
-            // html2canvas no. Igualar line-height al alto de la caja ayuda
-            // pero no basta.
-            //
-            // MEDIDO con las métricas de la fuente (measureText) contra los
-            // píxeles del PNG, en vez de a ojo: html2canvas baja el emoji
-            // 2,80px y el texto 1,62px respecto a donde los pone el
-            // navegador. Lo que se ve es la diferencia entre los dos, 1,18px,
-            // y ese es el ajuste — el resto se compensa solo porque bajan
-            // los dos a la vez.
-            ".hylo-badge-emoji{display:flex!important;line-height:18px!important;" +
-              "transform:translateY(-2.53px)!important}",
-            // Ni vertical-align con medida: el logo del CTA se le queda
-            // colgado arriba. Se le baja con una transformación, que sí
-            // aplica al pintar.
-            ".hylo-cta-logo{vertical-align:baseline!important;" +
-              "transform:translateY(calc(var(--alto) * 0.273))!important}",
-            // Y como con vertical-align:baseline el logo reserva su alto por
-            // ENCIMA de la línea, la caja crece hacia arriba y el bloque
-            // entero baja: medidos 100px de aire arriba contra 38 abajo.
-            // Se compensa quitando arriba lo mismo que se añade abajo
-            // (0.273 x 1.9em = el desplazamiento del logo).
-            ".hylo-cta{padding-top:calc(14px - 0.594em)!important;" +
-              "padding-bottom:calc(14px + 0.594em)!important}",
-          ].join("");
-          // head puede venir nulo en el documento clonado; documentElement no.
-          (doc.head ?? doc.documentElement)?.appendChild(est);
-        },
-      });
+      let lienzo = await hacerFoto(ajusteEmojiMedido ?? 0);
+
+      // La PRIMERA descarga de la sesión se hace dos veces: una para ver dónde
+      // cae el emoji en este navegador y otra ya corregida. Cuánto lo baja
+      // html2canvas depende del motor —Safari y Chrome no coinciden—, así que
+      // se mide en vez de llevarlo escrito. Las siguientes van a una toma.
+      if (ajusteEmojiMedido === null) {
+        const desfase = medirDesfaseEmoji(lienzo, marco, esc);
+        ajusteEmojiMedido =
+          desfase === null ? 0 : Math.max(-6, Math.min(6, +(-desfase).toFixed(2)));
+        if (ajusteEmojiMedido !== 0) lienzo = await hacerFoto(ajusteEmojiMedido);
+      }
 
       const blob = await new Promise<Blob | null>((res) =>
         lienzo.toBlob(res, "image/png"),
