@@ -305,11 +305,26 @@ export function renderHyloContent(
 }
 
 
-// Cuánto hay que subir el emoji de la etiqueta en la FOTO. Se mide una vez por
-// sesión (ver medirDesfaseEmoji) porque depende del motor del navegador:
-// Safari y Chrome colocan el texto distinto y un número fijo sale torcido en
-// uno de los dos. null = todavía sin medir.
-let ajusteEmojiMedido: number | null = null;
+// Cuánto baja html2canvas el contenido de la etiqueta respecto a donde lo pone
+// el navegador. MEDIDO con las métricas de la tipografía contra los píxeles del
+// PNG: el texto cae 1,62px y el emoji 2,80.
+//
+// Los DOS caen, y por eso el contenido quedaba hundido dentro del óvalo. El
+// desplazamiento común se corrige moviendo el relleno de la píldora (así suben
+// emoji y texto a la vez, sin tocar el alto del óvalo) y al emoji se le sube
+// aparte lo que cae de más.
+//
+// Se pueden probar otros valores sin tocar el código, con la URL:
+//   /?subir=1.62&subirEmoji=1.18
+// Es para afinarlo a ojo cuando la medida ya no da más de sí.
+function delaUrl(clave: string, pordefecto: number) {
+  if (typeof location === "undefined") return pordefecto;
+  const v = parseFloat(new URLSearchParams(location.search).get(clave) ?? "");
+  return Number.isFinite(v) ? Math.max(-8, Math.min(8, v)) : pordefecto;
+}
+
+const CAIDA_TEXTO = delaUrl("subir", 1.62);
+const CAIDA_EXTRA_EMOJI = delaUrl("subirEmoji", 2.8 - 1.62);
 
 /**
  * Mete en la copia que va a fotografiar html2canvas: (a) el CSS de la página,
@@ -319,7 +334,7 @@ let ajusteEmojiMedido: number | null = null;
  * la hoja de estilos se vuelve a pedir por su cuenta; si no llegaba a tiempo
  * salía un PNG sin estilos, con serifas y sin tarjeta.
  */
-function aplicarParches(doc: Document, ajusteEmoji: number) {
+function aplicarParches(doc: Document) {
   let css = "";
   for (const hoja of Array.from(document.styleSheets)) {
     try {
@@ -342,9 +357,12 @@ function aplicarParches(doc: Document, ajusteEmoji: number) {
       ".hylo-author{overflow:visible!important}",
       // No entiende inline-flex y el emoji se le cae por debajo del texto.
       // Dentro de un flex, `flex` se ve igual. El empujón que queda va medido.
-      ".hylo-badge-emoji{display:flex!important;line-height:18px!important" +
-        (ajusteEmoji ? `;transform:translateY(${ajusteEmoji}px)!important` : "") +
-        "}",
+      `.hylo-badge-emoji{display:flex!important;line-height:18px!important;` +
+        `transform:translateY(${-CAIDA_EXTRA_EMOJI}px)!important}`,
+      // Sube emoji y texto A LA VEZ robándole al relleno de arriba lo que se
+      // le da al de abajo: el óvalo mide lo mismo y el contenido sube.
+      `.hylo-badge{padding-top:calc(5px - ${CAIDA_TEXTO}px)!important;` +
+        `padding-bottom:calc(5px + ${CAIDA_TEXTO}px)!important}`,
       // Ni vertical-align con medida: el logo del CTA se le queda colgado
       // arriba. Con una transformación sí lo baja.
       ".hylo-cta-logo{vertical-align:baseline!important;" +
@@ -359,74 +377,6 @@ function aplicarParches(doc: Document, ajusteEmoji: number) {
   // head puede venir nulo en el documento clonado; documentElement no.
   (doc.head ?? doc.documentElement)?.appendChild(est);
 }
-
-/**
- * Mide, sobre la foto YA HECHA, cuánto ha quedado el emoji por debajo del
- * texto de la etiqueta. Devuelve píxeles CSS (positivo = el emoji está bajo).
- *
- * Se mide aquí y no sobre la píldora suelta porque html2canvas coloca el texto
- * de forma distinta según el tamaño y el contexto en que lo pinta: calibrar
- * con la píldora aislada daba 1,6px y la foto real tenía 2,5px.
- */
-function medirDesfaseEmoji(
-  lienzo: HTMLCanvasElement,
-  marco: HTMLElement,
-  esc: number,
-): number | null {
-  const emo = marco.querySelector<HTMLElement>(".hylo-badge-emoji");
-  const lab = marco.querySelector<HTMLElement>(
-    ".hylo-badge span:not(.hylo-badge-emoji)",
-  );
-  if (!emo || !lab) return null;
-
-  const ctx = lienzo.getContext("2d");
-  if (!ctx) return null;
-  const W = lienzo.width;
-  const datos = ctx.getImageData(0, 0, W, lienzo.height).data;
-  const en = (x: number, y: number) => {
-    const i = (y * W + x) * 4;
-    return [datos[i], datos[i + 1], datos[i + 2]];
-  };
-
-  const base = marco.getBoundingClientRect();
-  const centro = (el: HTMLElement, dxFondo: number) => {
-    const r = el.getBoundingClientRect();
-    const x0 = Math.round((r.left - base.left) * esc);
-    const y0 = Math.round((r.top - base.top) * esc);
-    const an = Math.round(r.width * esc);
-    const al = Math.round(r.height * esc);
-    // El color de la píldora, tomado a un lado del glifo.
-    const fondo = en(x0 + dxFondo, y0 + Math.round(al / 2));
-    const hayTinta = (x: number, y: number) => {
-      const p = en(x, y);
-      return (
-        Math.abs(p[0] - fondo[0]) +
-          Math.abs(p[1] - fondo[1]) +
-          Math.abs(p[2] - fondo[2]) >
-        45
-      );
-    };
-    const margen = Math.round(3 * esc);
-    let arr: number | null = null;
-    let aba = 0;
-    for (let y = y0 - margen; y < y0 + al + margen; y++) {
-      for (let x = x0 + 1; x < x0 + an - 1; x++) {
-        if (hayTinta(x, y)) {
-          if (arr === null) arr = y;
-          aba = y;
-          break;
-        }
-      }
-    }
-    return arr === null ? null : (arr + aba) / 2;
-  };
-
-  const cE = centro(emo, -Math.round(5 * esc));
-  const cL = centro(lab, Math.round(lab.getBoundingClientRect().width * esc) + 12);
-  if (cE === null || cL === null) return null;
-  return (cE - cL) / esc;
-}
-
 
 type PropsTarjeta = {
   r: PanelPostRow;
@@ -479,8 +429,7 @@ export function TarjetaHylo({
       const alto = ancho * 1.25; // 4:5, el del post de Instagram
       const esc = 1080 / ancho;
 
-      const hacerFoto = (ajusteEmoji: number) =>
-        html2canvas(marco, {
+      const lienzo = await html2canvas(marco, {
           width: ancho,
           height: alto,
           scale: esc,
@@ -498,21 +447,9 @@ export function TarjetaHylo({
             el.classList?.contains("hylo-bajo") ||
             (document.body.contains(el) &&
               !(el === marco || el.contains(marco) || marco.contains(el))),
-          onclone: (doc) => aplicarParches(doc, ajusteEmoji),
-        });
+          onclone: (doc) => aplicarParches(doc),
+      });
 
-      let lienzo = await hacerFoto(ajusteEmojiMedido ?? 0);
-
-      // La PRIMERA descarga de la sesión se hace dos veces: una para ver dónde
-      // cae el emoji en este navegador y otra ya corregida. Cuánto lo baja
-      // html2canvas depende del motor —Safari y Chrome no coinciden—, así que
-      // se mide en vez de llevarlo escrito. Las siguientes van a una toma.
-      if (ajusteEmojiMedido === null) {
-        const desfase = medirDesfaseEmoji(lienzo, marco, esc);
-        ajusteEmojiMedido =
-          desfase === null ? 0 : Math.max(-6, Math.min(6, +(-desfase).toFixed(2)));
-        if (ajusteEmojiMedido !== 0) lienzo = await hacerFoto(ajusteEmojiMedido);
-      }
 
       const blob = await new Promise<Blob | null>((res) =>
         lienzo.toBlob(res, "image/png"),
