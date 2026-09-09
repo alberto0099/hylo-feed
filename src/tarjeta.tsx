@@ -245,43 +245,32 @@ export function renderHyloContent(
             justifyContent: "flex-start",
           }}
         >
-          <div
-            style={{
-              width: "100%",
-              maxWidth: "100%",
-              maxHeight: capture ? 560 : hasImage ? 340 : 360,
-              borderRadius: hasImage ? 20 : 22,
-              overflow: "hidden",
-              background: "transparent",
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "flex-start",
+          {/* La caja se ajusta A LA FOTO, no al revés.
+              Antes iba con width:100% y maxHeight fijo: en una captura
+              vertical el navegador dejaba la caja ancha, metía la foto dentro
+              con barras a los lados, y el redondeo caía en la CAJA — de ahí
+              que esas salieran con las esquinas cuadradas. Con width:auto la
+              caja ES la foto y el redondeo la abraza siempre. */}
+          <img
+            src={r.image_url}
+            alt=""
+            loading="lazy"
+            crossOrigin="anonymous"
+            onClick={() => {
+              if (r.image_url) opts?.onAbrirImagen?.(r.image_url);
             }}
-          >
-            <img
-              src={r.image_url}
-              alt=""
-              loading="lazy"
-              crossOrigin="anonymous"
-              onClick={
-                capture
-                  ? undefined
-                  : () => {
-                      if (r.image_url) opts?.onAbrirImagen?.(r.image_url);
-                    }
-              }
-              style={{
-                width: "100%",
-                height: "auto",
-                maxWidth: "100%",
-                maxHeight: capture ? 560 : hasImage ? 340 : 360,
-                objectFit: "contain",
-                display: "block",
-                borderRadius: hasImage ? 20 : 22,
-                cursor: capture ? "default" : "zoom-in",
-              }}
-            />
-          </div>
+            style={{
+              width: "auto",
+              height: "auto",
+              maxWidth: "100%",
+              // Bajado de 340: a esa altura la tarjeta se salía del recuadro
+              // 4:5 y se comía la banda del CTA (el logo salía cortado).
+              maxHeight: ALTO_MAX_IMAGEN,
+              display: "block",
+              borderRadius: 20,
+              cursor: "zoom-in",
+            }}
+          />
         </div>
       ) : null}
 
@@ -327,6 +316,10 @@ const CAIDA_TEXTO = delaUrl("subir", 4.2);
 const CAIDA_EXTRA_EMOJI = delaUrl("subirEmoji", 2.8 - 1.62);
 // Sube SOLO el texto de la categoría, además de lo que ya sube con el resto.
 const CAIDA_EXTRA_TEXTO = delaUrl("subirTexto", 0.8);
+
+// Alto máximo de la foto de un hylo. Manda sobre la maquetación entera: con
+// más, la tarjeta se sale del recuadro 4:5 y pisa la banda del CTA.
+const ALTO_MAX_IMAGEN = delaUrl("altoFoto", 165);
 
 /**
  * Mete en la copia que va a fotografiar html2canvas: (a) el CSS de la página,
