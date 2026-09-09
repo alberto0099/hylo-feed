@@ -344,6 +344,13 @@ export function TarjetaHylo({
     if (!marco || ocupado) return;
     setOcupado(true);
     try {
+      // Sin esto la foto puede salir con la tipografía de reserva.
+      try {
+        await document.fonts?.ready;
+      } catch {
+        // Navegador sin la API: se sigue igual.
+      }
+
       const caja = marco.getBoundingClientRect();
       const ancho = caja.width;
       const alto = ancho * 1.25; // 4:5, el del post de Instagram
@@ -368,9 +375,28 @@ export function TarjetaHylo({
             !(el === marco || el.contains(marco) || marco.contains(el))),
         onclone: (doc) => {
           const est = doc.createElement("style");
+          // El CSS de la página, COPIADO a mano dentro de la copia.
+          //
+          // html2canvas monta la copia en un iframe aparte, y allí la hoja de
+          // estilos se vuelve a pedir por su cuenta: si no ha llegado cuando
+          // pinta, sale un PNG sin estilos —texto negro con serifas y sin
+          // tarjeta—. Pasaba de vez en cuando, y más en el móvil. Metiendo
+          // las reglas aquí ya no depende de esa carrera.
+          let css = "";
+          for (const hoja of Array.from(document.styleSheets)) {
+            try {
+              for (const regla of Array.from(hoja.cssRules)) {
+                css += regla.cssText + "\n";
+              }
+            } catch {
+              // Hoja de otro origen (las tipografías de Google): no se puede
+              // leer, y tampoco hace falta para la maquetación.
+            }
+          }
+
           // Parches SOLO para la foto. La página se queda como está: aquí
           // se corrigen las cosas que html2canvas no sabe interpretar.
-          est.textContent = [
+          est.textContent = css + [
             // El marco de líneas finas separa unas tarjetas de otras EN LA
             // PÁGINA; dentro de la imagen sobra.
             ".hylo-item::before,.hylo-item::after{display:none!important}",
