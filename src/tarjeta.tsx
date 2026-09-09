@@ -395,9 +395,13 @@ function guardarDescargado(id: string, si: boolean) {
  * barras a los lados, y el redondeo caía en la CAJA — por eso esas salían con
  * las esquinas cuadradas.
  *
- * Pero width:auto ANTES de cargar da una caja de 0x0, y entonces `loading=lazy`
- * no la considera nunca visible y la foto no se carga jamás. Así que hasta que
- * carga ocupa el ancho completo, y solo después se ciñe a la foto.
+ * Pero width:auto ANTES de cargar da una caja de 0x0, así que hasta que carga
+ * ocupa el ancho completo y solo después se ciñe a la foto.
+ *
+ * SIN carga diferida a propósito: con `loading=lazy` las fotos dejaron de
+ * salir —una caja de cero no la da el navegador por visible y no la pide
+ * nunca— y ni con el ancho restablecido volvieron. Son 62 fotos en todo el
+ * feed y esto lo usan dos personas: más vale que carguen siempre.
  */
 function FotoDelHylo({ url, onAbrir }: { url: string; onAbrir: () => void }) {
   const [cargada, setCargada] = useState(false);
@@ -405,7 +409,7 @@ function FotoDelHylo({ url, onAbrir }: { url: string; onAbrir: () => void }) {
     <img
       src={url}
       alt=""
-      loading="lazy"
+      decoding="async"
       crossOrigin="anonymous"
       onLoad={() => setCargada(true)}
       onClick={onAbrir}
