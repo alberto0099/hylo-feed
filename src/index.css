@@ -369,7 +369,12 @@ img {
   vertical-align: calc(var(--alto) * -0.273);
   width: auto;
   display: inline-block;
-  margin: 0 1px 0 0;
+  /* El PNG del logo trae 5,5% de transparencia a la izquierda y 2,75% a la
+     derecha (medido sobre el fichero), así que el aire antes de "hylo" salía
+     del doble que el de después. Se recorta el de la izquierda: el hueco que
+     queda es el espacio de la palabra y ya está.
+     0,101 = 5,5% x la proporción del PNG (3307/1800). */
+  margin: 0 1px 0 calc(var(--alto) * -0.101);
 }
 
 /* =========================================================
