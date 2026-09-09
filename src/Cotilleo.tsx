@@ -18,11 +18,37 @@ export default function Cotilleo() {
   const [categoria, setCategoria] = useState("");
   const [nombre, setNombre] = useState("");
 
-  // El nombre que iOS pone bajo el icono al añadir a pantalla de inicio.
+  // "Instalable como app" se enciende AQUÍ, no en el index.html, porque ese
+  // HTML sirve también el feed público: si el manifiesto fuese del sitio
+  // entero, quien añadiese el feed a su pantalla de inicio acabaría con un
+  // icono llamado "Cotilleo" que abre esta herramienta.
+  //
+  // Safari lee estas etiquetas del DOM en el momento de "Añadir a pantalla de
+  // inicio", así que ponerlas al montar la pantalla llega a tiempo.
   useEffect(() => {
     document.title = "Cotilleo";
-    const m = document.querySelector('meta[name="apple-mobile-web-app-title"]');
-    if (m) m.setAttribute("content", "Cotilleo");
+
+    const puestas: Element[] = [];
+    function meta(name: string, content: string) {
+      const el = document.createElement("meta");
+      el.setAttribute("name", name);
+      el.setAttribute("content", content);
+      document.head.appendChild(el);
+      puestas.push(el);
+    }
+
+    const manifiesto = document.createElement("link");
+    manifiesto.rel = "manifest";
+    manifiesto.href = "/manifest.webmanifest";
+    document.head.appendChild(manifiesto);
+    puestas.push(manifiesto);
+
+    meta("apple-mobile-web-app-capable", "yes");
+    meta("mobile-web-app-capable", "yes");
+    meta("apple-mobile-web-app-status-bar-style", "black-translucent");
+    meta("apple-mobile-web-app-title", "Cotilleo");
+
+    return () => puestas.forEach((el) => el.remove());
   }, []);
 
   // La fecha se congela al montar: si fuese Date.now() en cada tecleo, la
