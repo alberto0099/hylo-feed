@@ -323,9 +323,16 @@ type PropsTarjeta = {
   /** Clave única; da nombre al PNG y marca el lienzo oculto. */
   rowKey: string;
   onAbrirImagen?: (url: string) => void;
+  /** Controles extra en la fila de debajo del marco, junto a Descargar. */
+  acciones?: ReactNode;
 };
 
-export function TarjetaHylo({ r, rowKey, onAbrirImagen }: PropsTarjeta) {
+export function TarjetaHylo({
+  r,
+  rowKey,
+  onAbrirImagen,
+  acciones,
+}: PropsTarjeta) {
   const nodoCaptura = useRef<HTMLDivElement | null>(null);
   const [ocupado, setOcupado] = useState(false);
 
@@ -411,29 +418,34 @@ export function TarjetaHylo({ r, rowKey, onAbrirImagen }: PropsTarjeta) {
           </div>
         </article>
 
-        <button
-          type="button"
-          className="hylo-descarga"
-          onClick={() => void descargar()}
-          disabled={ocupado}
-        >
-          {ocupado ? (
-            "Preparando..."
-          ) : (
-            <>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Descargar
-            </>
-          )}
-        </button>
+        {/* Fila de debajo del marco: vive FUERA del recuadro (top: 100%) para
+            que no salga en la imagen exportada. */}
+        <div className="hylo-bajo">
+          <button
+            type="button"
+            className="hylo-descarga"
+            onClick={() => void descargar()}
+            disabled={ocupado}
+          >
+            {ocupado ? (
+              "Preparando..."
+            ) : (
+              <>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Descargar
+              </>
+            )}
+          </button>
+          {acciones}
+        </div>
 
         <div className="hylo-cta-slot" aria-hidden="true">
           <span className="hylo-cta">

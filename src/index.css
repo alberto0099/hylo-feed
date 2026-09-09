@@ -705,11 +705,21 @@ img {
    Vive FUERA del recuadro (top: 100%), en el hueco que deja el gap de la
    rejilla, para que no salga en la imagen exportada.
 ========================================================= */
-.hylo-descarga {
+.hylo-bajo {
   position: absolute;
   top: calc(100% + 16px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.hylo-descarga {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -733,7 +743,7 @@ img {
 }
 
 .hylo-descarga:active {
-  transform: translateX(-50%) scale(0.96);
+  transform: scale(0.96);
 }
 
 .hylo-descarga:disabled {
@@ -782,15 +792,6 @@ img {
   cursor: pointer;
 }
 
-.cotilleo-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px 18px 20px;
-  background: #1a1a20;
-}
-
-.cotilleo-texto,
 .cotilleo-select,
 .cotilleo-nombre {
   width: 100%;
@@ -808,25 +809,9 @@ img {
   appearance: none;
 }
 
-.cotilleo-texto {
-  resize: vertical;
-  line-height: 1.4;
-}
-
-.cotilleo-texto:focus,
 .cotilleo-select:focus,
 .cotilleo-nombre:focus {
   border-color: rgba(244, 178, 230, 0.55);
-}
-
-.cotilleo-campos {
-  display: flex;
-  gap: 10px;
-}
-
-.cotilleo-campos > * {
-  flex: 1 1 0;
-  min-width: 0;
 }
 
 .cotilleo-vacio {
@@ -844,4 +829,73 @@ img {
 
 .cotilleo-vista .hylo-grid {
   padding-bottom: 40px;
+}
+
+/* El nombre de la cuenta conectada, junto al título. */
+.cotilleo-cuenta {
+  margin-left: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* El desplegable de categoría, en la fila de debajo del marco. */
+.cotilleo-select--fila {
+  width: auto;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.10);
+  border-color: transparent;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.cotilleo-hecho {
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 18px;
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.88);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cotilleo-hecho:active {
+  transform: scale(0.96);
+}
+
+.cotilleo-aviso {
+  margin: 0;
+  padding: 54px 26px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.cotilleo-detalle {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.45);
+  word-break: break-word;
+}
+
+.cotilleo-boton {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  background: #f4b2e6;
+  color: #1a1a20;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+/* Los mensajes llevan una fila con más controles: hace falta más hueco. */
+.cotilleo-vista .hylo-grid {
+  gap: 108px;
+  padding-bottom: 60px;
 }
