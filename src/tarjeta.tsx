@@ -563,6 +563,10 @@ export function TarjetaHylo({
   }
 
   return (
+    // El envoltorio existe para que los botones queden FUERA de la caja de
+    // la tarjeta: el recorte de content-visibility (ver .hylo-slot) se los
+    // comía cuando colgaban de ella.
+    <div className="hylo-slot">
       <div
         ref={refMarco}
         className={`hylo-item ${r.image_url ? "hylo-item--image" : ""} ${
@@ -580,6 +584,21 @@ export function TarjetaHylo({
             {renderHyloContent(r, category, authorName, { onAbrirImagen })}
           </div>
         </article>
+
+
+        <div className="hylo-cta-slot" aria-hidden="true">
+          <span className="hylo-cta">
+            Descarga{" "}
+            {/* La versión de 500px y no el original de 3307x1800: el logo se
+                pinta 523 veces (una por tarjeta) y reescalar ese PNG de 608KB
+                otras tantas era buena parte de lo que atascaba el scroll. Se
+                dibuja a 66px, y en la foto exportada a 183. */}
+            <img src="/hylo_logo_500.png" alt="Hylo" className="hylo-cta-logo" />.
+            Tu campus ya está dentro.
+          </span>
+        </div>
+
+      </div>
 
         {/* Fila de debajo del marco: vive FUERA del recuadro (top: 100%) para
             que no salga en la imagen exportada. */}
@@ -633,19 +652,6 @@ export function TarjetaHylo({
 
           {acciones}
         </div>
-
-        <div className="hylo-cta-slot" aria-hidden="true">
-          <span className="hylo-cta">
-            Descarga{" "}
-            {/* La versión de 500px y no el original de 3307x1800: el logo se
-                pinta 523 veces (una por tarjeta) y reescalar ese PNG de 608KB
-                otras tantas era buena parte de lo que atascaba el scroll. Se
-                dibuja a 66px, y en la foto exportada a 183. */}
-            <img src="/hylo_logo_500.png" alt="Hylo" className="hylo-cta-logo" />.
-            Tu campus ya está dentro.
-          </span>
-        </div>
-
-      </div>
+    </div>
   );
 }

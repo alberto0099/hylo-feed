@@ -194,7 +194,7 @@ img {
   position: relative;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 76px;
+  gap: 34px;
   padding: 0;
   overflow: visible;
 }
@@ -214,6 +214,19 @@ img {
 /* =========================================================
    HYLO ITEM SPACING
 ========================================================= */
+/* Cada hylo: el recuadro 4:5 y, debajo, sus botones.
+   El feed tiene 523 y casi 300.000px de alto; con content-visibility el
+   navegador no maqueta ni pinta los que están fuera de pantalla, que es lo
+   que atascaba el scroll. Va AQUÍ y no en .hylo-item porque el recorte que
+   trae se comía los botones, que quedan por debajo de la tarjeta. */
+.hylo-slot {
+  /* Sin esto la rejilla le da un ancho mínimo automático según su contenido y
+     la columna se ensancha más que la pantalla. Le pasaba lo mismo a
+     .hylo-item cuando era ella la hija directa. */
+  min-width: 0;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 560px;
+}
 .hylo-item {
   position: relative;
   display: flex;
@@ -223,12 +236,6 @@ img {
   aspect-ratio: 4 / 5;
   padding: 0;
   box-sizing: border-box;
-  /* El feed tiene 523 tarjetas y casi 300.000px de alto. Con esto el
-     navegador no maqueta ni pinta las que están fuera de pantalla, que es lo
-     que hacía que el scroll se atascara. `auto` en el tamaño recordado evita
-     que la barra de desplazamiento pegue saltos. */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 469px;
   /* Sin esto, la rejilla le da al recuadro un ancho mínimo automático
      derivado de la altura del contenido (alto x 0.8) y una sola tarjeta larga
      ensancha la columna entera: 624px en una pantalla de 375. */
@@ -260,7 +267,7 @@ img {
   pointer-events: none;
 }
 
-.hylo-item:first-child {
+.hylo-slot:first-child .hylo-item {
   margin-top: 200px;
 }
 
@@ -651,7 +658,7 @@ img {
   }
 
   .hylo-grid {
-    gap: 64px;
+    gap: 28px;
     padding: 0;
   }
 
@@ -664,7 +671,7 @@ img {
     max-height: 260px;
   }
 
-  .hylo-item:first-child {
+  .hylo-slot:first-child .hylo-item {
     margin-top: 90px;
   }
 
@@ -722,16 +729,16 @@ img {
    rejilla, para que no salga en la imagen exportada.
 ========================================================= */
 .hylo-bajo {
-  position: absolute;
-  top: calc(100% + 16px);
-  left: 0;
-  right: 0;
+  /* En el flujo, debajo del recuadro. Antes iba en absoluto colgando de la
+     tarjeta y por eso el recorte se lo llevaba por delante. */
+  padding-top: 16px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0 12px;
+  padding-left: 12px;
+  padding-right: 12px;
   box-sizing: border-box;
 }
 
@@ -839,7 +846,7 @@ img {
 }
 
 /* La vista previa no lleva los 200px de aire del primer hylo del feed. */
-.cotilleo-vista .hylo-item:first-child {
+.cotilleo-vista .hylo-slot:first-child .hylo-item {
   margin-top: 26px;
 }
 
