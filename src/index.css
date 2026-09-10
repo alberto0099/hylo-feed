@@ -223,6 +223,12 @@ img {
   aspect-ratio: 4 / 5;
   padding: 0;
   box-sizing: border-box;
+  /* El feed tiene 523 tarjetas y casi 300.000px de alto. Con esto el
+     navegador no maqueta ni pinta las que están fuera de pantalla, que es lo
+     que hacía que el scroll se atascara. `auto` en el tamaño recordado evita
+     que la barra de desplazamiento pegue saltos. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 469px;
   /* Sin esto, la rejilla le da al recuadro un ancho mínimo automático
      derivado de la altura del contenido (alto x 0.8) y una sola tarjeta larga
      ensancha la columna entera: 624px en una pantalla de 375. */

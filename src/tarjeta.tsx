@@ -636,7 +636,12 @@ export function TarjetaHylo({
 
         <div className="hylo-cta-slot" aria-hidden="true">
           <span className="hylo-cta">
-            Descarga <img src="/hylo_logo.png" alt="Hylo" className="hylo-cta-logo" />.
+            Descarga{" "}
+            {/* La versión de 500px y no el original de 3307x1800: el logo se
+                pinta 523 veces (una por tarjeta) y reescalar ese PNG de 608KB
+                otras tantas era buena parte de lo que atascaba el scroll. Se
+                dibuja a 66px, y en la foto exportada a 183. */}
+            <img src="/hylo_logo_500.png" alt="Hylo" className="hylo-cta-logo" />.
             Tu campus ya está dentro.
           </span>
         </div>
