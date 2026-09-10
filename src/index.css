@@ -333,8 +333,12 @@ img {
 .hylo-cta-slot {
   /* En el flujo, como último hijo: así ocupa el ancho entero del recuadro y,
      sobre todo, la tarjeta se centra en el hueco que deja y no en el alto
-     completo (antes quedaba baja, casi encima de la banda). */
-  position: static;
+     completo (antes quedaba baja, casi encima de la banda).
+     RELATIVE y no static: el z-index no le hace nada a un elemento estático,
+     y sin él la tarjeta se pintaba ENCIMA de la banda y le comía la parte
+     alta del logo, que asoma por arriba. Solo se notaba en los hylos con
+     foto, que son los de tarjeta más alta. */
+  position: relative;
   z-index: 1;
   display: block;
   pointer-events: none;
