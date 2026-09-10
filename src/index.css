@@ -718,7 +718,12 @@ img {
   padding: 3px 10px;
 }
 
-.hylo-item--image img {
+/* SOLO la foto del hylo, no cualquier <img> del recuadro.
+   Sin acotarlo a .hylo-card, este border-radius se lo comía también al logo
+   del CTA: 20px de redondeo sobre un logo de 36px de alto le cortaban la
+   esquina de la "h" en diagonal. Solo pasaba en los hylos con foto, que son
+   los únicos con la clase --image. */
+.hylo-item--image .hylo-card img {
   max-height: 200px;
   border-radius: 20px;
 }
