@@ -10,8 +10,8 @@ const AVION = "<path fill=\"#ffffff\" d=\"M 939.539062 1388.546875 C 936.226562 
 function IconoSvg({ viewBox, contenido }: { viewBox: string; contenido: string }) {
   return (
     <svg
-      width="18"
-      height="18"
+      width="24"
+      height="24"
       viewBox={viewBox}
       aria-hidden="true"
       style={{ display: "block" }}

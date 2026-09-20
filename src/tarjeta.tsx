@@ -9,7 +9,7 @@
 // ve en pantalla es una vista previa, no la imagen final.
 
 import { useRef, useState, type ReactNode } from "react";
-import html2canvas from "html2canvas";
+import { exportarNodoAPng } from "./exportar";
 
 import { IconoComentario, IconoEnviar } from "./iconos";
 
@@ -67,13 +67,16 @@ export function formatFeedDate(iso: string) {
   });
 }
 
+/** Grosor del trazo del corazón. Lo usan la tarjeta y, escalado, la foto. */
+const GROSOR_CORAZON = 1.65;
+
 function Heart({ filled }: { filled: boolean }) {
   return (
     <span
       style={{
         position: "relative",
-        width: 18,
-        height: 18,
+        width: 24,
+        height: 24,
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
@@ -89,13 +92,18 @@ function Heart({ filled }: { filled: boolean }) {
           justifyContent: "center",
         }}
       >
+        {/* El filo de los otros dos iconos mide 1,52 px a este tamaño (medido
+            sobre el dibujo), pero poner aquí lo mismo dejaba el corazón
+            visiblemente más fino: se dibuja 22,3 px de ancho y ellos 19,8, o
+            sea que el mismo grosor pesa menos repartido en una figura mayor.
+            Por eso va un punto por encima. */}
         <svg
-          width="18"
-          height="18"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill={filled ? "white" : "none"}
           stroke="white"
-          strokeWidth="1.9"
+          strokeWidth={GROSOR_CORAZON}
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
@@ -292,10 +300,8 @@ function delaUrl(clave: string, pordefecto: number) {
   return Number.isFinite(v) ? Math.max(-8, Math.min(8, v)) : pordefecto;
 }
 
-const CAIDA_TEXTO = delaUrl("subir", 4.2);
-const CAIDA_EXTRA_EMOJI = delaUrl("subirEmoji", 2.8 - 1.62);
-// Sube SOLO el texto de la categoría, además de lo que ya sube con el resto.
-const CAIDA_EXTRA_TEXTO = delaUrl("subirTexto", 0.8);
+// (Los ajustes de caída del emoji y del texto de la etiqueta eran parches para
+// html2canvas. Ya no hacen falta: la foto la dibuja el navegador.)
 
 // Alto máximo de la foto de un hylo. Manda sobre la maquetación entera: con
 // más, la tarjeta se sale del recuadro 4:5 y pisa la banda del CTA.
@@ -319,58 +325,6 @@ if (typeof document !== "undefined") {
  * la hoja de estilos se vuelve a pedir por su cuenta; si no llegaba a tiempo
  * salía un PNG sin estilos, con serifas y sin tarjeta.
  */
-function aplicarParches(doc: Document) {
-  let css = "";
-  for (const hoja of Array.from(document.styleSheets)) {
-    try {
-      for (const regla of Array.from(hoja.cssRules)) css += regla.cssText + "\n";
-    } catch {
-      // Hoja de otro origen (las tipografías de Google): ni se puede leer ni
-      // hace falta para la maquetación.
-    }
-  }
-
-  const est = doc.createElement("style");
-  est.textContent =
-    css +
-    [
-      // El marco de líneas finas separa unas tarjetas de otras EN LA PÁGINA;
-      // dentro de la imagen sobra.
-      ".hylo-item::before,.hylo-item::after{display:none!important}",
-      // Un hylo ya descargado se ve apagado en la página; si se vuelve a
-      // descargar, la imagen tiene que salir a pleno color igual.
-      ".hylo-item--hecho .hylo-card,.hylo-item--hecho .hylo-cta-slot" +
-        "{opacity:1!important}",
-      // overflow:hidden es para cortar el nombre con puntos suspensivos; al
-      // pintarlo le recorta la cola de la "p".
-      ".hylo-author{overflow:visible!important}",
-      // No entiende inline-flex y el emoji se le cae por debajo del texto.
-      // Dentro de un flex, `flex` se ve igual. El empujón que queda va medido.
-      `.hylo-badge-emoji{display:flex!important;line-height:18px!important;` +
-        `transform:translateY(${-CAIDA_EXTRA_EMOJI}px)!important}`,
-      // Sube emoji y texto A LA VEZ robándole al relleno de arriba lo que se
-      // le da al de abajo: el óvalo mide lo mismo y el contenido sube.
-      `.hylo-badge{padding-top:calc(5px - ${CAIDA_TEXTO}px)!important;` +
-        `padding-bottom:calc(5px + ${CAIDA_TEXTO}px)!important}`,
-      // Y el texto de la categoría, lo suyo aparte si hace falta.
-      CAIDA_EXTRA_TEXTO
-        ? `.hylo-badge span:not(.hylo-badge-emoji){transform:translateY(${-CAIDA_EXTRA_TEXTO}px)!important}`
-        : "",
-      // Ni vertical-align con medida: el logo del CTA se le queda colgado
-      // arriba. Con una transformación sí lo baja.
-      ".hylo-cta-logo{vertical-align:baseline!important;" +
-        "transform:translateY(calc(var(--alto) * 0.273))!important}",
-      // Y como así el logo reserva su alto POR ENCIMA de la línea, la caja
-      // crece hacia arriba y el bloque baja. Se compensa quitando arriba lo
-      // mismo que se añade abajo.
-      ".hylo-cta{padding-top:calc(14px - 0.594em)!important;" +
-        "padding-bottom:calc(14px + 0.594em)!important}",
-    ].join("");
-
-  // head puede venir nulo en el documento clonado; documentElement no.
-  (doc.head ?? doc.documentElement)?.appendChild(est);
-}
-
 // Los hylos que ya se han descargado, para no repetirlos al publicar.
 //
 // Van en el navegador (localStorage), no en el servidor: la marca es de QUIEN
@@ -486,6 +440,31 @@ export function TarjetaHylo({
   // tarjeta copiada de la pantalla, o sea diminuta sobre un lienzo 2,4 veces
   // más ancho. Capturando el marco real, lo que ves es lo que te llevas y no
   // hay dos diseños que mantener.
+  // Solo para la foto: el fondo de la página (que vive en .app-shell, fuera
+  // del recuadro) y sin las líneas que separan un hylo del siguiente.
+  //
+  // Y una compensación: dentro de una perspectiva 3D (la que inclina la
+  // tarjeta) Chrome dibuja el TRAZO de un SVG a resolución de pantalla y luego
+  // lo estira, así que en la foto, que sale al doble, el corazón salía a la
+  // mitad de grosor mientras los otros dos iconos —que son siluetas rellenas,
+  // no trazos— salían bien. Medido: el grosor del trazo se queda fijo pase lo
+  // que pase, o sea que basta multiplicarlo por la escala de la foto.
+  const CSS_FOTO_BASE = `
+    .hylo-item { background: #140c13 !important; overflow: hidden !important; }
+    .hylo-item::before {
+      content: "" !important;
+      position: absolute !important;
+      left: -40% !important; right: -40% !important;
+      top: -40% !important; bottom: -40% !important;
+      background: url("/patron-h.png") repeat !important;
+      background-size: 180px auto !important;   /* el mismo que .app-shell::before en index.css */
+      transform: rotate(-11deg) !important;
+      opacity: 0.055 !important;
+      z-index: 0 !important;
+    }
+    .hylo-item::after { display: none !important; }
+  `;
+
   function marcar(si: boolean) {
     setDescargado(si);
     guardarDescargado(rowKey, si);
@@ -506,33 +485,21 @@ export function TarjetaHylo({
       const caja = marco.getBoundingClientRect();
       const ancho = caja.width;
       const alto = ancho * 1.25; // 4:5, el del post de Instagram
-      const esc = 1080 / ancho;
 
-      const lienzo = await html2canvas(marco, {
-          width: ancho,
-          height: alto,
-          scale: esc,
-          backgroundColor: "#db92c9",
-          useCORS: true,
-          logging: false,
-          // Poda doble: fuera los controles de debajo (no son parte de la
-          // imagen) y fuera las otras 522 tarjetas, que si no html2canvas las
-          // clona todas para pintar una sola.
-          //
-          // La poda se limita a lo que cuelga de <body>: si se aplicara al
-          // documento entero se llevaría por delante los <style> del <head> y
-          // la copia salía SIN CSS — fondo blanco y texto suelto.
-          ignoreElements: (el) =>
-            el.classList?.contains("hylo-bajo") ||
-            (document.body.contains(el) &&
-              !(el === marco || el.contains(marco) || marco.contains(el))),
-          onclone: (doc) => aplicarParches(doc),
+      // La foto la dibuja el propio navegador (ver exportar.ts), así que sale
+      // EXACTAMENTE el recuadro que se ve en la página: la misma tarjeta, la
+      // misma luz y la misma sombra. Lo único que se añade es el fondo, que en
+      // la página lo pone .app-shell y queda fuera del recuadro.
+      const escala = 1080 / ancho;
+      const blob = await exportarNodoAPng(marco, {
+        ancho,
+        alto,
+        anchoFinal: 1080,
+        cssExtra:
+          CSS_FOTO_BASE +
+          `.hylo-like svg { stroke-width: ${(GROSOR_CORAZON * escala).toFixed(3)}px !important; }`,
       });
 
-
-      const blob = await new Promise<Blob | null>((res) =>
-        lienzo.toBlob(res, "image/png"),
-      );
       if (!blob) return;
 
       const nombre = `hylo-${rowKey}.png`;

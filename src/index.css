@@ -960,3 +960,307 @@ img {
   padding: 8px 6px;
   cursor: pointer;
 }
+
+/* =========================================================
+   TARJETAS EN 3D  (estilo de las animaciones de Hylo)
+   El texto sigue siendo texto: la captura sale nítida y se puede
+   seguir seleccionando. El relieve se hace con perspectiva, una
+   inclinación pequeña, el canto extruido y una sombra larga.
+========================================================= */
+.hylo-item {
+  perspective: 1500px;
+  perspective-origin: 50% 42%;
+}
+
+.hylo-card {
+  /* La tarjeta se queda un pelín más pequeña para que al girar no toque
+     los bordes del recuadro 4:5 que luego se recorta. */
+  transform: scale(0.9) rotateX(2.2deg) rotateY(-6deg);
+  transform-origin: 50% 55%;
+  border-radius: 30px;
+  background: linear-gradient(158deg, #32323c 0%, #26262e 48%, #1f1f26 100%);
+  box-shadow:
+    /* filo iluminado de arriba, como el clearcoat de las animaciones */
+    0 1px 0 rgba(255, 255, 255, 0.10) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.35) inset,
+    /* el canto: capas sólidas que dan grosor */
+    -7px 9px 0 -2px #1a1a20,
+    -12px 16px 0 -5px #141419,
+    /* sombra proyectada, larga y suave */
+    -18px 34px 48px -18px rgba(0, 0, 0, 0.62),
+    0 60px 80px -40px rgba(0, 0, 0, 0.55);
+  transition: transform 260ms ease, box-shadow 260ms ease;
+}
+
+/* Las impares giran hacia el otro lado: el muro no queda monótono. */
+.hylo-slot:nth-child(even) .hylo-card {
+  transform: scale(0.9) rotateX(2.2deg) rotateY(6deg);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.10) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.35) inset,
+    7px 9px 0 -2px #1a1a20,
+    12px 16px 0 -5px #141419,
+    18px 34px 48px -18px rgba(0, 0, 0, 0.62),
+    0 60px 80px -40px rgba(0, 0, 0, 0.55);
+}
+
+/* Brillo suave que cruza la tarjeta, como la luz de las animaciones. */
+.hylo-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(
+    122deg,
+    rgba(255, 255, 255, 0.085) 0%,
+    rgba(255, 255, 255, 0.025) 26%,
+    rgba(255, 255, 255, 0) 52%
+  );
+}
+
+/* Al pasar por encima se endereza un poco, como si la levantaras. */
+.hylo-card:hover {
+  transform: scale(0.92) rotateX(1deg) rotateY(-2.5deg);
+}
+.hylo-slot:nth-child(even) .hylo-card:hover {
+  transform: scale(0.92) rotateX(1deg) rotateY(2.5deg);
+}
+
+/* Las etiquetas y los botones se despegan un poco de la tarjeta. */
+.hylo-badge {
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.28), 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+}
+.hylo-action {
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.45));
+}
+
+/* =========================================================
+   FONDO OSCURO CON EL ICONO REPETIDO  +  INCLINACIÓN DE LAS ANIMACIONES
+========================================================= */
+.app-shell {
+  background:
+    radial-gradient(1100px 820px at 50% 26%, #2a2031 0%, #17151c 46%, #0b0b0f 100%);
+}
+
+/* La h con el punto, repetida por todo el fondo */
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: -14%;
+  background-image: url("/patron-h.png");
+  background-size: 78px 78px;
+  background-repeat: repeat;
+  transform: rotate(-11deg);
+  opacity: 0.045;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* El marco 4:5 sobre fondo oscuro pide líneas claras, no negras */
+.hylo-item::before {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) top center / 100% 1px no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) left center / 1px 100% no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) right center / 1px 100% no-repeat;
+}
+.hylo-item::after { background: rgba(255, 255, 255, 0.12); }
+
+/* Inclinación como en las animaciones: más giro y la tarjeta echada atrás */
+.hylo-item { perspective: 1150px; perspective-origin: 50% 40%; }
+
+.hylo-card {
+  transform: scale(0.9) rotateX(-3.5deg) rotateY(-11deg);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.10) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.35) inset,
+    -9px 10px 0 -2px #1a1a20,
+    -15px 18px 0 -5px #131318,
+    -22px 38px 54px -18px rgba(0, 0, 0, 0.7),
+    0 70px 90px -44px rgba(0, 0, 0, 0.6);
+}
+.hylo-slot:nth-child(even) .hylo-card {
+  transform: scale(0.9) rotateX(-3.5deg) rotateY(11deg);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.10) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.35) inset,
+    9px 10px 0 -2px #1a1a20,
+    15px 18px 0 -5px #131318,
+    22px 38px 54px -18px rgba(0, 0, 0, 0.7),
+    0 70px 90px -44px rgba(0, 0, 0, 0.6);
+}
+.hylo-card:hover { transform: scale(0.92) rotateX(-1.5deg) rotateY(-5deg); }
+.hylo-slot:nth-child(even) .hylo-card:hover { transform: scale(0.92) rotateX(-1.5deg) rotateY(5deg); }
+
+/* =========================================================
+   AJUSTES: extrusión suave, iconos más grandes, sin banda de descarga
+========================================================= */
+/* El relieve, con muchas capas finas: se lee como una pieza con grosor
+   y no como varias tarjetas apiladas. */
+.hylo-card {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.10) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.35) inset,
+    -2px 2px 0 -1px rgb(38 38 44),
+    -4px 4px 0 -1px rgb(36 36 42),
+    -6px 6px 0 -1px rgb(34 34 40),
+    -8px 8px 0 -1px rgb(32 32 38),
+    -10px 10px 0 -1px rgb(30 30 36),
+    -12px 12px 0 -1px rgb(28 28 34),
+    -14px 14px 0 -1px rgb(26 26 32),
+    -16px 16px 0 -1px rgb(24 24 30),
+    -18px 18px 0 -1px rgb(22 22 28),
+    -20px 20px 0 -1px rgb(20 20 26),
+    -22px 22px 0 -1px rgb(18 18 24),
+    -24px 24px 0 -1px rgb(16 16 22),
+    -26px 26px 0 -1px rgb(14 14 20),
+    -28px 28px 0 -1px rgb(12 12 18),
+    -34px 46px 60px -20px rgba(0, 0, 0, 0.75);
+}
+.hylo-slot:nth-child(even) .hylo-card {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.10) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.35) inset,
+    2px 2px 0 -1px rgb(38 38 44),
+    4px 4px 0 -1px rgb(36 36 42),
+    6px 6px 0 -1px rgb(34 34 40),
+    8px 8px 0 -1px rgb(32 32 38),
+    10px 10px 0 -1px rgb(30 30 36),
+    12px 12px 0 -1px rgb(28 28 34),
+    14px 14px 0 -1px rgb(26 26 32),
+    16px 16px 0 -1px rgb(24 24 30),
+    18px 18px 0 -1px rgb(22 22 28),
+    20px 20px 0 -1px rgb(20 20 26),
+    22px 22px 0 -1px rgb(18 18 24),
+    24px 24px 0 -1px rgb(16 16 22),
+    26px 26px 0 -1px rgb(14 14 20),
+    28px 28px 0 -1px rgb(12 12 18),
+    34px 46px 60px -20px rgba(0, 0, 0, 0.75);
+}
+
+/* Iconos de like, comentario y enviar, más grandes */
+.hylo-action { width: 30px; height: 30px; }
+.hylo-actions { gap: 18px; }
+
+/* Fuera la banda de "Descarga hylo. Tu campus ya está dentro." */
+.hylo-cta-slot { display: none; }
+
+/* El patrón, un punto más presente */
+.app-shell::before { background-size: 104px auto; opacity: 0.06; }
+
+/* El rosa de la página también a oscuro: html, body y la raíz */
+html,
+body,
+#root {
+  background: #0b0b0f;
+}
+
+/* Menos haches y más separadas: la misma h, con más aire entre ellas */
+.app-shell::before { background-size: 178px auto; opacity: 0.055; }
+
+/* Un pelín más de haches */
+.app-shell::before { background-size: 150px auto; }
+
+/* =========================================================
+   EL CANTO, MEJOR: cara lateral con su sombreado y su filo
+========================================================= */
+.hylo-card {
+  /* Menos giro: a 11 grados el canto se estiraba y parecía una mancha. */
+  transform: scale(0.9) rotateX(-2.5deg) rotateY(-8deg);
+  background: linear-gradient(152deg, #34343e 0%, #2a2a33 42%, #212129 100%);
+}
+.hylo-slot:nth-child(even) .hylo-card {
+  transform: scale(0.9) rotateX(-2.5deg) rotateY(8deg);
+}
+/* El filo de fuera del canto, que es lo que hace que se lea como una caja. */
+.hylo-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.045) inset,
+    0 -18px 26px -22px rgba(0, 0, 0, 0.9) inset;
+}
+
+/* =========================================================
+   FUERA EL RELIEVE DE DETRÁS: la tarjeta se queda con su
+   inclinación, su filo y una sombra suave, sin el canto extruido.
+   (El grosor de verdad lo pone el render 3D de la descarga.)
+========================================================= */
+.hylo-card,
+.hylo-slot:nth-child(even) .hylo-card {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.32) inset,
+    0 26px 44px -18px rgba(0, 0, 0, 0.66);
+}
+.hylo-card::before { display: none; }
+
+/* =========================================================
+   Menos inclinación y un fondo negro con algo de rosa
+========================================================= */
+.hylo-card { transform: scale(0.9) rotateX(-1.6deg) rotateY(-5deg); }
+.hylo-slot:nth-child(even) .hylo-card { transform: scale(0.9) rotateX(-1.6deg) rotateY(5deg); }
+
+html,
+body,
+#root { background: #140c13; }
+
+.app-shell {
+  background:
+    radial-gradient(1150px 860px at 50% 24%, #35203180 0%, #1d1119 46%, #140c13 100%),
+    #140c13;
+}
+
+/* =========================================================
+   Vuelve el reclamo bajo el hylo, sin tira de fondo y con relieve
+========================================================= */
+.hylo-cta-slot { display: block; }
+
+.hylo-cta {
+  background: transparent;
+  padding: 14px 16px 20px;
+  color: #fff;
+  /* Relieve suave: dos filos oscuros y una sombra para despegarlo del fondo. */
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.55),
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 6px 14px rgba(0, 0, 0, 0.55);
+}
+
+.hylo-cta-logo {
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.45)) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+}
+
+/* Menos haches y más grandes */
+.app-shell::before { background-size: 240px auto; }
+
+/* =========================================================
+   El reclamo, justo debajo del hylo y un punto más grande
+   El hueco libre del recuadro se reparte entre arriba (el auto de la tarjeta)
+   y abajo (el auto del reclamo), así que los dos quedan juntos y centrados.
+========================================================= */
+.hylo-card { margin-bottom: 0; }
+.hylo-cta-slot { margin-bottom: auto; }
+
+.hylo-cta {
+  font-size: 22px;
+  padding: 18px 16px 0;
+}
+
+/* Más haches: de 240 a 180 px se ve una más en cada fila del recuadro.
+   OJO: este número tiene gemelo en CSS_FOTO (tarjeta.tsx), que es el que pinta
+   el fondo de la foto. Si cambias uno, cambia el otro. */
+.app-shell::before { background-size: 180px auto; }
+
+/* El reclamo, un pelín más corto de línea: sigue siendo mayor que antes
+   (era 19 px), pero ocupa menos ancho. */
+.hylo-cta {
+  font-size: 20.5px;
+  letter-spacing: -0.02em;
+}
+.hylo-cta-logo { --alto: 1.8em; }
