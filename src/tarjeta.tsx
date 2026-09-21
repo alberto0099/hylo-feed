@@ -450,19 +450,8 @@ export function TarjetaHylo({
   // no trazos— salían bien. Medido: el grosor del trazo se queda fijo pase lo
   // que pase, o sea que basta multiplicarlo por la escala de la foto.
   const CSS_FOTO_BASE = `
-    .hylo-item { background: #140c13 !important; overflow: hidden !important; }
-    .hylo-item::before {
-      content: "" !important;
-      position: absolute !important;
-      left: -40% !important; right: -40% !important;
-      top: -40% !important; bottom: -40% !important;
-      background: url("/patron-h.png") repeat !important;
-      background-size: 180px auto !important;   /* el mismo que .app-shell::before en index.css */
-      transform: rotate(-11deg) !important;
-      opacity: 0.055 !important;
-      z-index: 0 !important;
-    }
-    .hylo-item::after { display: none !important; }
+    .hylo-item { background-color: #140c13 !important; overflow: hidden !important; }
+    .hylo-item::before, .hylo-item::after { display: none !important; }
   `;
 
   function marcar(si: boolean) {

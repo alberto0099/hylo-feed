@@ -1264,3 +1264,38 @@ body,
   letter-spacing: -0.02em;
 }
 .hylo-cta-logo { --alto: 1.8em; }
+
+/* Las haches, un poco más a la derecha. Va en el transform y no en
+   background-position porque la capa está girada: en sus coordenadas el
+   desplazamiento saldría en diagonal, y así se mueve recto en pantalla.
+   El patrón se repite y la capa sobra un 14% por cada lado, así que no
+   aparece ningún borde. */
+.app-shell::before { transform: translateX(60px) rotate(-11deg); }
+
+/* Las haches, un pelín más grandes (su gemelo está en CSS_FOTO, tarjeta.tsx) */
+.app-shell::before { background-size: 200px auto; }
+
+/* =========================================================
+   SEIS HACHES POR RECUADRO, NINGUNA CORTADA
+   El mosaico repetido dejaba haches partidas por los bordes y un número
+   distinto en cada hylo. Ahora son seis copias sueltas colocadas a dedo
+   dentro del recuadro 4:5: al ir en porcentaje, el 0% pega la hache al borde
+   izquierdo y el 100% al derecho, así que entre 8% y 92% ninguna se sale.
+   La hache va YA girada en el fichero (public/hache.png), porque sin capa
+   girada no hay forma de inclinarla sin mover también las posiciones.
+   El tamaño, 119 px, es el mismo que tenía con el mosaico de 200.
+========================================================= */
+.app-shell::before { display: none; }
+
+.hylo-item {
+  background-color: transparent;
+  background-image:
+    url("/hache.png"), url("/hache.png"), url("/hache.png"),
+    url("/hache.png"), url("/hache.png"), url("/hache.png");
+  background-repeat: no-repeat;
+  background-size: 119px auto;
+  /* En zigzag: van bajando alternando izquierda y derecha. Es la que
+     gustó. La de 26% 41% cae detrás de la tarjeta y no se ve, pero la
+     caída del conjunto es la que manda. */
+  background-position: 10% 8%, 80% 17%, 26% 41%, 92% 55%, 9% 76%, 63% 93%;
+}
