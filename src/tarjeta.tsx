@@ -108,7 +108,13 @@ function Heart({ filled }: { filled: boolean }) {
           strokeLinejoin="round"
           aria-hidden="true"
         >
-          <path d="M12 21s-6.7-4.35-9.33-8.09C.8 10.26 1.36 6.5 4.28 4.77c2.2-1.3 4.74-.65 6.22 1.03L12 7.47l1.5-1.67c1.48-1.68 4.02-2.33 6.22-1.03 2.92 1.73 3.48 5.49 1.61 8.14C18.7 16.65 12 21 12 21z" />
+          {/* fill también AQUÍ y no solo en el <svg>: dentro del SVG que se
+              usa para la foto, Safari se salta el fill del elemento padre y
+              pintaba el corazón relleno en vez de contorneado. */}
+          <path
+            fill={filled ? "white" : "none"}
+            d="M12 21s-6.7-4.35-9.33-8.09C.8 10.26 1.36 6.5 4.28 4.77c2.2-1.3 4.74-.65 6.22 1.03L12 7.47l1.5-1.67c1.48-1.68 4.02-2.33 6.22-1.03 2.92 1.73 3.48 5.49 1.61 8.14C18.7 16.65 12 21 12 21z"
+          />
         </svg>
       </span>
     </span>
@@ -452,7 +458,16 @@ export function TarjetaHylo({
   const CSS_FOTO_BASE = `
     .hylo-item { background-color: #140c13 !important; overflow: hidden !important; }
     .hylo-item::before, .hylo-item::after { display: none !important; }
+    /* SIN inclinación en la foto. La página la mantiene, pero Safari no aplica
+       transformaciones 3D dentro del SVG con el que se compone la imagen: la
+       tarjeta salía recta en el iPhone y girada en el ordenador. Quitándola en
+       los dos, la foto es la misma en todas partes. La sombra sí se queda. */
+    .hylo-card, .hylo-slot:nth-child(even) .hylo-card { transform: scale(0.9) !important; }
   `;
+
+  // El ancho con el que se compone SIEMPRE la foto, en píxeles CSS. Es el que
+  // tiene el recuadro en el ordenador (.hylo-wrap: 548 menos su aire).
+  const ANCHO_FOTO = 536;
 
   function marcar(si: boolean) {
     setDescargado(si);
@@ -471,22 +486,29 @@ export function TarjetaHylo({
         // Navegador sin la API: se sigue igual.
       }
 
-      const caja = marco.getBoundingClientRect();
-      const ancho = caja.width;
+      // ANCHO FIJO, no el del dispositivo. La página es adaptable: en el
+      // ordenador el recuadro mide 536 px y en un móvil, 402. Como la letra y
+      // los iconos tienen tamaño fijo en píxeles, exportar con el ancho de
+      // cada pantalla daba fotos distintas —en el iPhone el texto salía
+      // proporcionalmente más grande y el reclamo se partía en dos líneas—.
+      // Con una medida de referencia, la foto es la misma en todas partes.
+      const ancho = ANCHO_FOTO;
       const alto = ancho * 1.25; // 4:5, el del post de Instagram
 
       // La foto la dibuja el propio navegador (ver exportar.ts), así que sale
       // EXACTAMENTE el recuadro que se ve en la página: la misma tarjeta, la
       // misma luz y la misma sombra. Lo único que se añade es el fondo, que en
       // la página lo pone .app-shell y queda fuera del recuadro.
-      const escala = 1080 / ancho;
+      // SIN compensar el grosor del corazón. Hizo falta mientras la foto
+      // llevaba la inclinación 3D, porque dentro de una perspectiva el trazo
+      // de un SVG se dibuja a resolución de pantalla y no escalaba con la
+      // imagen. Ahora la foto va plana y el trazo escala solo; multiplicarlo
+      // otra vez lo dejaba al doble de grueso que los otros dos iconos.
       const blob = await exportarNodoAPng(marco, {
         ancho,
         alto,
         anchoFinal: 1080,
-        cssExtra:
-          CSS_FOTO_BASE +
-          `.hylo-like svg { stroke-width: ${(GROSOR_CORAZON * escala).toFixed(3)}px !important; }`,
+        cssExtra: CSS_FOTO_BASE,
       });
 
       if (!blob) return;
