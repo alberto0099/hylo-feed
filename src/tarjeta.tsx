@@ -463,6 +463,12 @@ export function TarjetaHylo({
        tarjeta salía recta en el iPhone y girada en el ordenador. Quitándola en
        los dos, la foto es la misma en todas partes. La sombra sí se queda. */
     .hylo-card, .hylo-slot:nth-child(even) .hylo-card { transform: scale(0.9) !important; }
+    /* SIN sombras. Safari las dibuja ignorando las esquinas redondeadas: en el
+       iPhone salía un rectángulo negro asomando por el lado de la tarjeta y
+       otro rodeando la etiqueta. Chrome las pinta bien, así que la única forma
+       de que la foto sea la misma en los dos es que no las lleve ninguno. La
+       tarjeta se sigue despegando del fondo por color: #2b2b33 sobre #140c13. */
+    .hylo-item, .hylo-item * { box-shadow: none !important; }
   `;
 
   // El ancho con el que se compone SIEMPRE la foto, en píxeles CSS. Es el que
