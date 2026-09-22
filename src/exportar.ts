@@ -157,15 +157,43 @@ async function medirImagenes(
       `<!doctype html><meta charset="utf-8"><style>html,body{margin:0;padding:0}${css}</style>${html}`,
     );
     doc.close();
-    // Un respiro para que aplique el CSS antes de medir.
-    await new Promise((r) => requestAnimationFrame(() => r(null)));
+
+    // ESPERAR DE VERDAD antes de medir. Con un solo fotograma de respiro
+    // bastaba en el simulador, pero en un iPhone real no: el <img> del
+    // logotipo todavía no había cargado, medía cero y se descartaba, así que
+    // luego no se dibujaba y la frase salía con un hueco. Hay que esperar a
+    // las imágenes (posición y tamaño) y a las tipografías (el logo va dentro
+    // de una línea de texto: si la letra aún no está, cae en otro sitio).
+    await Promise.all([
+      ...Array.from(doc.images).map((im) =>
+        im.complete
+          ? Promise.resolve()
+          : new Promise((r) => {
+              im.onload = () => r(null);
+              im.onerror = () => r(null);
+            }),
+      ),
+      (doc as Document & { fonts?: FontFaceSet }).fonts?.ready ?? Promise.resolve(),
+      // OJO: el tope va con race SOBRE CADA espera, no como una espera más de
+      // la lista. Puesto en la lista se convertía en un suelo y siempre
+      // tardaba los 3 segundos enteros, aunque todo estuviera listo.
+    ].map((espera) =>
+      Promise.race([espera, new Promise((r) => setTimeout(r, 3000))]),
+    ));
+    await new Promise((r) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => r(null))),
+    );
 
     const fuera: ImagenSuelta[] = [];
     const base = doc.body.getBoundingClientRect();
 
+    let descartadas = 0;
     for (const im of Array.from(doc.querySelectorAll("img"))) {
       const r = im.getBoundingClientRect();
-      if (r.width < 1 || r.height < 1) continue;
+      if (r.width < 1 || r.height < 1) {
+        descartadas++;
+        continue;
+      }
       fuera.push({
         src: im.getAttribute("src") ?? "",
         x: r.left - base.left,
@@ -216,6 +244,7 @@ async function medirImagenes(
         });
       }
     }
+    diag.imagenesDescartadas = descartadas;
     return fuera;
   } finally {
     marco.remove();
