@@ -143,7 +143,7 @@ async function medirImagenes(
   css: string,
   ancho: number,
   alto: number,
-): Promise<ImagenSuelta[]> {
+): Promise<{ fondos: ImagenSuelta[]; imgs: ImagenSuelta[]; color: string }> {
   const marco = document.createElement("iframe");
   marco.setAttribute("aria-hidden", "true");
   marco.style.cssText =
@@ -151,7 +151,7 @@ async function medirImagenes(
   document.body.appendChild(marco);
   try {
     const doc = marco.contentDocument;
-    if (!doc) return [];
+    if (!doc) return { fondos: [], imgs: [], color: "transparent" };
     doc.open();
     doc.write(
       `<!doctype html><meta charset="utf-8"><style>html,body{margin:0;padding:0}${css}</style>${html}`,
@@ -184,8 +184,15 @@ async function medirImagenes(
       requestAnimationFrame(() => requestAnimationFrame(() => r(null))),
     );
 
-    const fuera: ImagenSuelta[] = [];
+    const fondos: ImagenSuelta[] = [];
+    const imgs: ImagenSuelta[] = [];
     const base = doc.body.getBoundingClientRect();
+    // El color de fondo del recuadro: se pinta a mano en el lienzo, porque el
+    // SVG va a ir SIN él para que las haches queden por debajo de la tarjeta.
+    const raiz = doc.body.firstElementChild?.firstElementChild as HTMLElement | null;
+    const color =
+      (raiz && doc.defaultView?.getComputedStyle(raiz).backgroundColor) ||
+      "transparent";
 
     let descartadas = 0;
     for (const im of Array.from(doc.querySelectorAll("img"))) {
@@ -194,7 +201,7 @@ async function medirImagenes(
         descartadas++;
         continue;
       }
-      fuera.push({
+      imgs.push({
         src: im.getAttribute("src") ?? "",
         x: r.left - base.left,
         y: r.top - base.top,
@@ -235,7 +242,7 @@ async function medirImagenes(
         }
         const resolver = (v: string, hueco: number) =>
           v.endsWith("%") ? (parseFloat(v) / 100) * hueco : parseFloat(v) || 0;
-        fuera.push({
+        fondos.push({
           src: m[1],
           x: caja.left - base.left + resolver(px, caja.width - w),
           y: caja.top - base.top + resolver(py, caja.height - h),
@@ -245,7 +252,7 @@ async function medirImagenes(
       }
     }
     diag.imagenesDescartadas = descartadas;
-    return fuera;
+    return { fondos, imgs, color };
   } finally {
     marco.remove();
   }
@@ -302,6 +309,10 @@ export async function exportarNodoAPng(
   // OJO: dentro de un SVG esto se lee como XML, así que el HTML tiene que ir
   // bien cerrado (XMLSerializer lo garantiza; outerHTML no) y el CSS dentro de
   // un bloque literal, porque trae ">" y "&" de los selectores y las url().
+  // La marca va ANTES de serializar: si se pone después, el SVG sale sin ella
+  // y el recuadro conserva su color de fondo opaco, que tapa las haches que se
+  // han pintado debajo.
+  clon.classList.add("__raiz-foto");
   const cuerpo = new XMLSerializer().serializeToString(envoltorio);
   // Reglas que solo hacen falta dentro del SVG, para atar en corto a Safari:
   //  - el autosizing otra vez, ahora para todo lo de dentro;
@@ -321,11 +332,16 @@ export async function exportarNodoAPng(
   // es no dejárselo a ninguno: se ocultan dentro del SVG (visibility, que no
   // mueve el sitio que ocupan) y luego se dibujan sobre el lienzo, que eso sí
   // lo hacen los dos igual.
+  // Además de ocultar las imágenes, el recuadro va SIN color de fondo: ese
+  // color y las haches se pintan en el lienzo ANTES del SVG, y así quedan
+  // debajo de la tarjeta. Pintándolo todo después, las haches se dibujaban
+  // ENCIMA y se veían a través del hylo.
   const sinImagenes =
     `img{visibility:hidden!important}` +
-    `*{background-image:none!important}`;
-  const imagenes = await medirImagenes(cuerpo, hoja, ancho, alto);
-  diag.imagenesAMano = imagenes.length;
+    `*{background-image:none!important}` +
+    `.__raiz-foto{background-color:transparent!important}`;
+  const medidas = await medirImagenes(cuerpo, hoja, ancho, alto);
+  diag.imagenesAMano = medidas.fondos.length + medidas.imgs.length;
   diag.fuentesKB = Math.round(fuentes.length / 1024);
   diag.tieneFuenteEmpotrada = fuentes.includes("data:font") || fuentes.includes("data:application/font");
   diag.cssKB = Math.round(css.length / 1024);
@@ -360,23 +376,34 @@ export async function exportarNodoAPng(
   const ctx = lienzo.getContext("2d");
   if (!ctx) return null;
   ctx.setTransform(escala, 0, 0, escala, 0, 0);
-  ctx.drawImage(img, 0, 0);
 
-  // Y encima, las imágenes, cada una en el sitio que se midió.
-  for (const it of imagenes) {
-    try {
-      const pieza = new Image();
-      pieza.decoding = "sync";
-      await new Promise<void>((ok, mal) => {
-        pieza.onload = () => ok();
-        pieza.onerror = () => mal(new Error("imagen"));
-        pieza.src = it.src;
-      });
-      ctx.drawImage(pieza, it.x, it.y, it.w, it.h);
-    } catch {
-      // Una imagen que no carga no puede tumbar la foto entera.
+  const pintar = async (piezas: ImagenSuelta[]) => {
+    for (const it of piezas) {
+      try {
+        const pieza = new Image();
+        pieza.decoding = "sync";
+        await new Promise<void>((ok, mal) => {
+          pieza.onload = () => ok();
+          pieza.onerror = () => mal(new Error("imagen"));
+          pieza.src = it.src;
+        });
+        ctx.drawImage(pieza, it.x, it.y, it.w, it.h);
+      } catch {
+        // Una imagen que no carga no puede tumbar la foto entera.
+      }
     }
+  };
+
+  // De atrás hacia delante: color del recuadro, las haches, el SVG con la
+  // tarjeta y el texto, y por último las <img> (el logotipo, la foto de un
+  // hylo), que van por encima del fondo pero dentro de su sitio.
+  if (medidas.color && medidas.color !== "transparent") {
+    ctx.fillStyle = medidas.color;
+    ctx.fillRect(0, 0, ancho, alto);
   }
+  await pintar(medidas.fondos);
+  ctx.drawImage(img, 0, 0);
+  await pintar(medidas.imgs);
 
   // ¿Ha salido algo? Si el navegador no supo pintar el foreignObject, el lienzo
   // queda transparente y la foto sería un rectángulo vacío. Mejor saberlo aquí
