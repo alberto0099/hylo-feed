@@ -213,7 +213,10 @@ async function medirImagenes(
     // Fondos con imagen: pueden ser VARIAS capas (las seis haches), cada una
     // con su posición. Se resuelven con las mismas cuentas que hace el
     // navegador: el porcentaje reparte el hueco que sobra, no la caja entera.
-    for (const el of Array.from(doc.querySelectorAll<HTMLElement>("*"))) {
+    // Solo el recuadro: es el único con imágenes de fondo (las haches) y el
+    // único al que se le quitan dentro del SVG. Mirar todos los elementos
+    // llevaría a dibujar a mano fondos que el navegador ya pinta bien.
+    for (const el of raiz ? [raiz] : []) {
       const cs = doc.defaultView?.getComputedStyle(el);
       if (!cs || cs.backgroundImage === "none") continue;
       const urls = cs.backgroundImage.split(/,(?![^(]*\))/);
@@ -336,10 +339,15 @@ export async function exportarNodoAPng(
   // color y las haches se pintan en el lienzo ANTES del SVG, y así quedan
   // debajo de la tarjeta. Pintándolo todo después, las haches se dibujaban
   // ENCIMA y se veían a través del hylo.
+  // OJO: el background-image se quita SOLO en el recuadro, no en todo.
+  // Puesto con `*` se llevaba por delante los DEGRADADOS, que también son
+  // imágenes de fondo: la tarjeta se quedaba sin el suyo y en Safari se
+  // transparentaba, dejando ver las haches a través del hylo. Los degradados
+  // los pinta bien cualquier navegador, así que se quedan; lo único que hay
+  // que evitar es que el patrón de haches se dibuje dos veces.
   const sinImagenes =
     `img{visibility:hidden!important}` +
-    `*{background-image:none!important}` +
-    `.__raiz-foto{background-color:transparent!important}`;
+    `.__raiz-foto{background-image:none!important;background-color:transparent!important}`;
   const medidas = await medirImagenes(cuerpo, hoja, ancho, alto);
   diag.imagenesAMano = medidas.fondos.length + medidas.imgs.length;
   diag.fuentesKB = Math.round(fuentes.length / 1024);
